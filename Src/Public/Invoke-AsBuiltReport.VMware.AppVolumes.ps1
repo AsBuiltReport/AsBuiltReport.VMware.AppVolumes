@@ -8,7 +8,7 @@
         Version:        0.1.1
         Author:         Chris Hildebrandt
         Twitter:        @childebrandt42
-        Github:         https://github.com/mattallford
+        Github:         https://github.com/AsBuiltReport/
         Credits:        Iain Brighton (@iainbrighton) - PScribo module
 
 
@@ -161,7 +161,7 @@
 
                                 } # Close Out $ManagersPSObj = [PSCustomObject]
                             $ManagersPSObj | Table -Name 'AppVolumes Manager Servers Information' -List -ColumnWidths 50,50
-                            } # Close out section -Style Heading2 'AppVolume Manager Servers Details'
+                            } # Close out section -Style Heading2 'AppVolumes Manager Servers Details'
                         } # Close out foreach($Manager in $Managers.group_permissions)
                 } # Close out section -Style Heading2 'AppVolumes Manager Servers Information'
             } # Close out if ($InfoLevel.AppVolumes.Managers -ge 1)
@@ -241,7 +241,7 @@
                             'AppVolumes Total AppStacks is' = $AppStackCount
                         } # Close out $ApplicationCountPSObj = [PSCustomObject]
                     $AppStackCountPSObj | Table -Name 'AppVolumes AppStack Count' -List -ColumnWidths 50,50
-                    } # Close out section -Style Heading2 "AppVolume AppStack Count"
+                    } # Close out section -Style Heading2 "AppVolumes AppStack Count"
 
                     if ($InfoLevel.AppVolumes.AppStacks -ge 3) {
                         foreach($AppStack in $AppStacks) {
@@ -380,7 +380,7 @@
                             'AppVolumes Total Applications is' = $ApplicationCount
                         }
                     $ApplicationCountPSObj | Table -Name 'AppVolumes Application Count' -List -ColumnWidths 50,50
-                    } # Close out section -Style Heading2 "AppVolume Application Count"
+                    } # Close out section -Style Heading2 "AppVolumes Application Count"
                     
                     if ($InfoLevel.AppVolumes.Applications -ge 3) {
                         foreach($Application in $Applications.applications) {
@@ -398,10 +398,9 @@
                                     'AppVolumes Application Icon Location' = $Application.icon
                                     'AppVolumes Application AppStack Installed On' = $AppStackInstalledSplit
                                     'AppVolumes Application Assignable' = $Application.assignable
-
                                 } # Close Out $ApplicationPSObj = [PSCustomObject]
                             $ApplicationPSObj | Table -Name 'AppVolumes Application Information' -List -ColumnWidths 50,50
-                            } # Close out section -Style Heading2 'AppVolume Application Details'
+                            } # Close out section -Style Heading2 'AppVolumes Application Details'
                         } # Close out foreach($Application in $Applications)
                     } # if ($InfoLevel.AppVolumes.Applications -ge 1)
                 } # Close out section -Style Heading2 'AppVolumes Application Information'
@@ -429,7 +428,7 @@
                                 'AppVolumes Total Active Directory Users is' = $ADUserCount
                             } # Close out $ApplicationCountPSObj = [PSCustomObject]
                         $ADUserCountPSObj | Table -Name 'AppVolumes Active Directory User Count' -List -ColumnWidths 50,50
-                        } # Close out section -Style Heading2 "AppVolume Active Directory User Count"
+                        } # Close out section -Style Heading2 "AppVolumes Active Directory User Count"
                     } # Close out if ($InfoLevel.AppVolumes.ADUsers -ge 1)
                     BlankLine
                     if ($InfoLevel.AppVolumes.ADUsers -ge 3) {
@@ -439,11 +438,10 @@
                                     'AppVolumes User Name' = $ActiveDirectoryUser.upn
                                     'AppVolumes User Last Logon' = $ActiveDirectoryUser.last_login_human
                                     'AppVolumes User Status' = $ActiveDirectoryUser.status
-                                    "AppVolumes User Writable's" = $ActiveDirectoryUser.writables
-                                    "AppVolumes User AppStack's" = $ActiveDirectoryUser.appstacks
+                                    "AppVolumes User Writable" = $ActiveDirectoryUser.writables
+                                    "AppVolumes User AppStack" = $ActiveDirectoryUser.appstacks
                                     "AppVolumes User Attachment's" = $ActiveDirectoryUser.attachments
                                     "AppVolumes User Login's" = $ActiveDirectoryUser.logins
-
                                 } # Close Out $ActiveDirectoryUserPSObj = [PSCustomObject]
                                 $ActiveDirectoryUserPSObj | Table -Name 'AppVolumes Active Directory User Information' -list -ColumnWidths 50,50
                                 
@@ -475,7 +473,7 @@
                                 'AppVolumes Total Active Directory Groups is' = $ADGroupCount
                             } # Close out $ADGroupCountPSObj = [PSCustomObject]
                         $ADGroupCountPSObj | Table -Name 'AppVolumes Active Directory Group Count' -List -ColumnWidths 50,50
-                        } # Close out section -Style Heading2 "AppVolume Active Directory Group Count"
+                        } # Close out section -Style Heading2 "AppVolumes Active Directory Group Count"
                     } # Close out if ($InfoLevel.AppVolumes.ADGroups -ge 1)
 
                     if ($InfoLevel.AppVolumes.ADGroups -ge 3) {
@@ -487,7 +485,7 @@
                                     'AppVolumes Group Status' = $ActiveDirectoryGroup.status
                                 } # Close Out $ActiveDirectoryGroupPSObj = [PSCustomObject]   
                             } # Close out foreach($ActiveDirectoryGroup in $ActiveDirectoryGroups)
-                            $ActiveDirectoryGroupPSObj | Table -Name 'AppVolumes Active Directory Group Information' -ColumnWidths 50,25,25
+                            $ActiveDirectoryGroupPSObj | Table -Name 'AppVolumes Active Directory Group Information' -ColumnWidths 50,30,20
                         } # Close out section -Style Heading2 'AppVolumes Active Directory Group Details'
                     } # Close out if ($InfoLevel.AppVolumes.ADGroups -ge 3)
                 } # Close out section -Style Heading2 'AppVolumes Active Directory Group Information'
@@ -531,7 +529,6 @@
                             'AppVolumes Datastore AppStack Template Path' = $Datastores.appstack_template_path
                             'AppVolumes Datastore Writeable Template Path' = $Datastores.writable_template_path
                         } # Close out $AppVolumesDataStoreOverviewPSObj = [PSCustomObject]
-
                         $AppVolumesDataStoreOverviewPSObj | Table -Name 'AppVolumes Datastore Overview Information' -List -ColumnWidths 50,50
                     } # Close out section -Style Heading2 'AppVolumes Datastore Overview Information'
 
@@ -545,7 +542,7 @@
                                 'AppVolumes Total Datastores is' = $StorageLocationCount
                             } # Close out $ApplicationCountPSObj = [PSCustomObject]
                         $StorageLocationCountPSObj | Table -Name 'AppVolumes Datastore Count' -List -ColumnWidths 50,50
-                        } # Close out section -Style Heading2 "AppVolume Datastore Count"
+                        } # Close out section -Style Heading2 "AppVolumes Datastore Count"
                     } # Close out if ($InfoLevel.AppVolumes.StorageLocations -ge 1)
 
                     if ($InfoLevel.AppVolumes.StorageLocations -ge 3) {
@@ -596,7 +593,7 @@
                                 'AppVolumes Total Storage Groups is' = $StorageGroupCount
                             } # Close out $ApplicationCountPSObj = [PSCustomObject]
                         $StorageGroupCountPSObj | Table -Name 'AppVolumes Storage Group Count' -List -ColumnWidths 50,50
-                        } # Close out section -Style Heading2 "AppVolume StorageGroup Count"
+                        } # Close out section -Style Heading2 "AppVolumes StorageGroup Count"
                     } # Close out if ($InfoLevel.AppVolumes.StorageGroups -ge 1)
 
                     if ($InfoLevel.AppVolumes.StorageGroups -ge 3) {
@@ -616,7 +613,6 @@
                                     'AppVolumes Storage Group Last Replicated Date' = $StorageGroup.replicated_at_human
                                     'AppVolumes Storage Group Last Imported Date' = $StorageGroup.imported_at_human
                                     'AppVolumes Storage Group Last Curated Date' = $StorageGroup.curated_at_human
-
                                 } # Close Out $StorageGroupPSObj = [PSCustomObject]
                             $StorageGroupPSObj | Table -Name 'AppVolumes Storage Group Information' -List
                             } # Close out section -Style Heading2 'AppVolumes Storage Group Details
@@ -648,7 +644,7 @@
                                 'AppVolumes Total AD Domains is' = $ADDomainCount
                             } # Close out $ApplicationCountPSObj = [PSCustomObject]
                         $ADDomainCountPSObj | Table -Name 'AppVolumes AD Domain Count' -List -ColumnWidths 50,50
-                        } # Close out section -Style Heading2 "AppVolume AD Domain Count"
+                        } # Close out section -Style Heading2 "AppVolumes AD Domain Count"
                     } # Close out if ($InfoLevel.AppVolumes.ADDomains -ge 1)
 
                     if ($InfoLevel.AppVolumes.ADDomains -ge 3) {
@@ -666,10 +662,9 @@
                                     'AppVolumes Active Directory Effective Port' = $LDAPDomain.effective_port
                                     'AppVolumes Active Directory Created At' = $LDAPDomain.created_at
                                     'AppVolumes Active Directory Updated At' = $LDAPDomain.updated_at
-
                                 } # Close Out $LDAPDomainsPSObj = [PSCustomObject]
                             $LDAPDomainsPSObj | Table -Name 'AppVolumes Active Directory Domains Information' -List -ColumnWidths 50,50
-                            } # Close out section -Style Heading2 'AppVolume Active Directory Domains Details'
+                            } # Close out section -Style Heading2 'AppVolumes Active Directory Domains Details'
                         } # Close out foreach($LDAPDomain in $LDAPDomains.group_permissions)
                     } # Close out if ($InfoLevel.AppVolumes.ADDomains -ge 3)
                 } # Close out section -Style Heading2 'AppVolumes Active Directory Domains Information'
@@ -698,22 +693,21 @@
                                 'AppVolumes Total Admin Groups is' = $AdminGroupCount
                             } # Close out $AdminGroupPSObj = [PSCustomObject]
                         $AdminGroupCountPSObj | Table -Name 'AppVolumes Admin Groups Count' -List -ColumnWidths 50,50
-                        } # Close out section -Style Heading2 "AppVolume Admin Groups Count"
+                        } # Close out section -Style Heading2 "AppVolumes Admin Groups Count"
                     } # Close out if ($InfoLevel.AppVolumes.AdminGroup -ge 1)
                     
                     if ($InfoLevel.AppVolumes.AdminGroups -ge 3) {
                         foreach($AdminGroup in $AdminGroups.group_permissions) {
-                            section -Style Heading2 'AppVolume Administrator Roles Details' {
+                            section -Style Heading2 'AppVolumes Administrator Roles Details' {
                                 $AdminGroupsPSObj = [PSCustomObject]@{
                                     'AppVolumes Administrator Role' = $AdminGroup.Role
                                     'AppVolumes Administrator Assignee UPN' = $AdminGroup.assignee_upn
                                     'AppVolumes Administrator Assignee Type' = $AdminGroup.assignee_type
                                     'AppVolumes Administrator Assignment Created at' = $AdminGroup.created_at
                                     'AppVolumes Administrator Assignment Updated at' = $AdminGroup.updated_at
-
                                 } # Close Out $AdminGroupsPSObj = [PSCustomObject]
-                            $AdminGroupsPSObj | Table -Name 'AppVolumes Administrator Roles Information' -List -ColumnWidths 50,50
-                            } # Close out section -Style Heading2 'AppVolume Administrator Roles Details'
+                            $AdminGroupsPSObj | Table -Name 'AppVolumes Administrators Roles Information' -List -ColumnWidths 50,50
+                            } # Close out section -Style Heading2 'AppVolumes Administrator Roles Details'
                         } # Close out foreach($AdminGroup in $AdminGroups.group_permissions)
                     } # Close out if ($InfoLevel.AppVolumes.AdminGroups -ge 3)
                 } # Close out section -Style Heading2 'AppVolumes Administrator Roles Information'
@@ -742,22 +736,21 @@
                                 'AppVolumes Total Machine Managers is' = $MachineManagerCount
                             } # Close out $MachineManagerPSObj = [PSCustomObject]
                         $MachineManagerPSObj | Table -Name 'AppVolumes Machine Managers Count' -List -ColumnWidths 50,50
-                        } # Close out section -Style Heading2 "AppVolume Machine Managers Count"
+                        } # Close out section -Style Heading2 "AppVolumes Machine Managers Count"
                     } # Close out if ($InfoLevel.AppVolumes.MachineManagers -ge 1)
 
                     if ($InfoLevel.AppVolumes.MachineManagers -ge 3) {
                         foreach($MachineManager in $MachineManagers.machine_managers) {
-                            section -Style Heading2 "AppVolume Machine Manager $($MachineManager.Host) Details" {
+                            section -Style Heading2 "AppVolumes Machine Manager $($MachineManager.Host) Details" {
                                 $MachineManagerPSObj = [PSCustomObject]@{
                                     'AppVolumes Machine Manager Name' = $MachineManager.host
                                     'AppVolumes Machine Manager Username' = $MachineManager.Username
                                     'AppVolumes Machine Manager Adapter Type' = $MachineManager.adapter_type
                                     'AppVolumes Machine Manager Type' = $MachineManager.type
                                     'AppVolumes Machine Manager Supports Multi' = $MachineManager.supports_multi
-
                                 } # Close Out $MachineManagerPSObj = [PSCustomObject]
                             $MachineManagerPSObj | Table -Name 'AppVolumes Machine Manager Information' -List -ColumnWidths 50,50
-                            } # Close out section -Style Heading2 'AppVolume Machine Manager Details'
+                            } # Close out section -Style Heading2 'AppVolumes Machine Manager Details'
                         } # Close out foreach($MachineManager in $MachineManagers)
                     } # Close out if ($InfoLevel.AppVolumes.MachineManagers -ge 1)
                 } # Close out section -Style Heading2 'AppVolumes Machine Manager Information'
@@ -786,12 +779,12 @@
                                 'AppVolumes Total Storage is' = $StorageCount
                             } # Close out $StorageCountPSObj = [PSCustomObject]
                         $StorageCountPSObj | Table -Name 'AppVolumes Storage Count' -List -ColumnWidths 50,50
-                        } # Close out section -Style Heading2 "AppVolume Storage Count"
+                        } # Close out section -Style Heading2 "AppVolumes Storage Count"
                     } # Close out if ($InfoLevel.AppVolumes.Storage -ge 1)
 
                     if ($InfoLevel.AppVolumes.Storage -ge 3) {
                         foreach($Storage in $Storages.Storages) {
-                            section -Style Heading2 "AppVolume Storage $($Storage.Name) Details" {
+                            section -Style Heading2 "AppVolumes Storage $($Storage.Name) Details" {
                                 $StoragePSObj = [PSCustomObject]@{
                                     'AppVolumes Storage Name' = $Storage.Name
                                     'AppVolumes Storage Host' = $Storage.host
@@ -802,10 +795,9 @@
                                     'AppVolumes Storage Attachable' = $Storage.attachable
                                     'AppVolumes Storage Created Date' = $Storage.created_at_human
                                     'AppVolumes Storage Status' = $Storage.status
-
                                 } # Close Out $StoragePSObj = [PSCustomObject]
                             $StoragePSObj | Table -Name 'AppVolumes Storage Information' -List -ColumnWidths 50,50
-                            } # Close out section -Style Heading2 'AppVolume Storage Details'
+                            } # Close out section -Style Heading2 'AppVolumes Storage Details'
                         } # Close out foreach($Storage in $Storages)
                     } # Close out if ($InfoLevel.AppVolumes.Storage -ge 3)
                 } # Close out section -Style Heading2 'AppVolumes Storage Information'
@@ -875,7 +867,6 @@
                             'AppVolumes Settings Writeable Volumes Storage Path' = $StoragePath
                             'AppVolumes Settings Disable Volume Cache' = $DisableSnapVolumeCache
                             'AppVolumes Settings Disable Token AD Query' = $DisableTokenADQuery
-
                         } # Close Out $SettingsPSObj = [PSCustomObject]
                         $SettingsPSObj | Table -Name 'AppVolumes Settings Information' -List -ColumnWidths 50,50
                     } # Close out section -Style Heading2 'AppVolumes Settings Details'
