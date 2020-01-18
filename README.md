@@ -61,22 +61,22 @@ Setting	InfoLevel	Description
 3	Comprehensive	provides comprehensive information for individual objects
 The following sections can be set
 
-Schema	    Sub-Schema	        Default Setting
-InfoLevel	General	            3
-InfoLevel	Managers	        3
-InfoLevel	License             3
-InfoLevel	AppStacks	        2
-InfoLevel	ADUsers 	        2
-InfoLevel	ADGroups	        2
-InfoLevel   Writeables          3
-InfoLevel	Applications	    3
-InfoLevel	StorageLocations	3
-InfoLevel	StorageGroups       3
-InfoLevel	ADDomains       	2
-InfoLevel	AdminGroups      	2
-InfoLevel	MachineManagers 	2
-InfoLevel   Storage             3
-InfoLevel   Settings            3
+Schema	    Sub-Schema	        Default Setting     Max Setting
+InfoLevel	General	            1                   1
+InfoLevel	Managers	        1                   1
+InfoLevel	License             1                   1
+InfoLevel	AppStacks	        1                   2
+InfoLevel	ADUsers 	        1                   2
+InfoLevel	ADGroups	        1                   2
+InfoLevel   Writeables          1                   2
+InfoLevel	Applications	    1                   2
+InfoLevel	StorageLocations	1                   2
+InfoLevel	StorageGroups       1                   2
+InfoLevel	ADDomains       	1                   2
+InfoLevel	AdminGroups      	1                   2
+InfoLevel	MachineManagers 	1                   2
+InfoLevel   Storage             1                   2
+InfoLevel   Settings            1                   1
 
 
 ## Examples
