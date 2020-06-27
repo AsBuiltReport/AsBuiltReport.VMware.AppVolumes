@@ -26,7 +26,7 @@ Install-Module AsBuiltReport
 
 ### Required Privileges
 
-To generate a VMware AppVolumes report, a user account with the Admin role or higher on the AppVolumes is required. (Required Admin rights to use the AppVol API's)
+To generate a VMware AppVolumes report, a user account with the Admin role or higher on the AppVolumes is required. (Required Admin rights to use the AppVol APIs)
 
 ## Configuration
 
@@ -88,4 +88,7 @@ PS C:\>New-AsBuiltReport -Report VMware.AppVolumes -Target 192.168.1.100 -Creden
 ```
 
 ## Known Issues
-The AppVolumes is required to have a trusted cert installed. If there is no trusted cert it will error. Workaround is to install a trusted cert or add the cert to the trusted certs store on the machine running the VMware AppVolumes AS-Built Report.
+The AppVolumes is required to have a trusted cert installed. If there is no trusted cert it will error. Workaround is to install a trusted cert or add the cert to the trusted certs store on the machine running the VMware AppVolumes AS Built Report.
+
+## Supported Versions
+Should work on versions 2.x. Has been tested on 2.14 through 2.18.4 and Version 4.0.0 and 4.0.1
