@@ -16,6 +16,7 @@
         https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes
     #>
 
+
     [CmdletBinding()]
     param (
         [String[]] $Target,
@@ -370,7 +371,6 @@
         #                                    Application Info                                         #
         #---------------------------------------------------------------------------------------------#
         
-
         # Generate report if connection to AppVolumes Application Information is successful
         if ($Applications) {
             if ($InfoLevel.AppVolumes.Applications -ge 1) {
@@ -393,7 +393,10 @@
                         foreach($Application in $Applications.applications) {
                             
                             $AppStackInstalled = $Application.snapvol
-                            $AppStackInstalledSplit = $AppStackInstalled.split("`n")|ForEach-Object{$_.split('>')[1]}|ForEach-Object{$_.split('<')[-2]}
+                            #$AppStackInstalledSplit = $AppStackInstalled.split("`n")|ForEach-Object{$_.split('>')[1]}|ForEach-Object{$_.split('<')[-2]}
+                            $AppStackInstalledSplit = $AppStackInstalled.split("`n")
+                            $AppStackInstalledSplit = $AppStackInstalled.split('>')[1]
+                            $AppStackInstalledSplit = $AppStackInstalledSplit.split('<')[-2]
 
                             $AppName = $Application.Name
                             $AppVersion = $Application.version
@@ -403,6 +406,7 @@
                             }
                             $ii++
 
+                            if(!$AppName)
                             section -Style Heading2 "AppVolumes Application $($Application.Name) Details" {
                                 $ApplicationPSObj = [PSCustomObject]@{
                                     'AppVolumes Application Name' = $AppName
