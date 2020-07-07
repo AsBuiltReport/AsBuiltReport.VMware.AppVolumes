@@ -1,0 +1,30 @@
+{
+	"Report": {
+        "Name": "VMware AppVolumes As Built Report",
+        "Version": "0.1.1",
+        "Status": "Released"
+    },
+    "Options": {
+        "ShowFaultSummary": true
+    },
+    "InfoLevel": {
+        "_comment_": "0 = Disabled, 1 = Summary, 2 = Detailed, 3 = Adv Detailed",
+        "AppVolumes": {
+            "General": 1,
+            "Managers": 1,
+            "License": 1,
+            "AppStacks": 1,
+            "ADUsers": 1,
+            "ADGroups": 1,
+            "Writeables": 1,
+            "Applications": 1,
+            "StorageLocations": 1,
+            "StorageGroups": 1,
+            "ADDomains": 1,
+            "AdminGroups": 1,
+            "MachineManagers": 1,
+            "Storage": 1,
+            "Settings": 1
+        } 
+    }
+}
