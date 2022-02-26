@@ -25,17 +25,14 @@
     ) #Close out Param
 
     # Import JSON Configuration for Options and InfoLevel
+    $Report = $ReportConfig.Report
     $InfoLevel = $ReportConfig.InfoLevel
-    #$Options = $ReportConfig.Options
+    $Options = $ReportConfig.Options
 
     # If custom style not set, use default style
-    if (!$StylePath) {
-        & "$PSScriptRoot\..\..\AsBuiltReport.VMware.AppVolumes.Style.ps1"
-    } #Close out If (!$StylePath)
 
 
     $RESTAPIUser = $Credential.UserName
-    $Credential.Password | ConvertFrom-SecureString
     $RESTAPIPassword = $Credential.GetNetworkCredential().password
 
     $AppVolRestCreds = @{
@@ -46,7 +43,7 @@
     foreach ($AppVolServer in $Target) {
     
         Try {
-            $AppVolServerRest = Invoke-RestMethod -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds 
+            $AppVolServerRest = Invoke-RestMethod -SkipCertificateCheck -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds 
         } Catch { 
             Write-Error $_
         } #Close Out Try Catch
@@ -64,49 +61,49 @@
             #Environment Varibles
             
             #General
-            $GeneralAppInfo = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"
+            $GeneralAppInfo = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"
 
             #Managers
-            $Managers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
+            $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
 
             #License Info
-            $License = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license"
+            $License = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license"
 
             #AppStacks
-            $AppStacks = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/appstacks"
+            $AppStacks = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/appstacks"
 
             #Writable Volumes
-            $Writables = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/writables"
+            $Writables = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/writables"
 
             #Applications
-            $Applications = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/applications"
+            $Applications = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/applications"
 
             #Directory Users
-            $ActiveDirectoryUsers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
+            $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
 
             #Directory Groups
-            $ActiveDirectoryGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
+            $ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
 
             #Storage Locations
-            $Datastores = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
+            $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
 
             #Storage Groups
-            $StorageGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
+            $StorageGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
 
             #AD Domains
-            $LDAPDomains = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
+            $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
 
             #Admin Roles
-            $AdminGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
+            $AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
 
             #Machine Managers
-            $MachineManagers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
+            $MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
 
             #Storage
-            $Storages = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
+            $Storages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
 
             #Settings
-            $Settings = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
+            $Settings = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
 
         } # Close out if ($AppVolServers) 
 
@@ -250,8 +247,8 @@
                     if ($InfoLevel.AppVolumes.AppStacks -ge 2) {
                         foreach($AppStack in $AppStacks) {
                             $AppStackID = $appstack.id
-                            $AppStackAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/appstacks/$AppStackID/assignments"
-                            $AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/appstacks/$AppStackID/"
+                            $AppStackAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/appstacks/$AppStackID/assignments"
+                            $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/appstacks/$AppStackID/"
 
                             PageBreak
                             section -Style Heading2 "AppVolumes AppStack $($AppStack.Name) Details" {
@@ -323,7 +320,7 @@
                     if ($InfoLevel.AppVolumes.writeables -ge 2) {
                         foreach($Writable in $Writables.datastores.writable_volumes) {
                             $WritablesID = $Writable.id
-                            $WritablesIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api//writables/$WritablesID/"
+                            $WritablesIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api//writables/$WritablesID/"
 
                             PageBreak
                             section -Style Heading2 "AppVolumes Writable Volume $($Writable.Name) Details" {
@@ -406,7 +403,6 @@
                             }
                             $ii++
 
-                            if(!$AppName)
                             section -Style Heading2 "AppVolumes Application $($Application.Name) Details" {
                                 $ApplicationPSObj = [PSCustomObject]@{
                                     'AppVolumes Application Name' = $AppName
