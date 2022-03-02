@@ -1,4 +1,4 @@
-# VMware SRM Default Document Style
+# VMware AppVolumes Default Document Style
 
 # Configure document options
 DocumentOption -EnableSectionNumbering -PageSize A4 -DefaultFont 'Arial' -MarginLeftAndRight 71 -MarginTopAndBottom 71 -Orientation $Orientation
