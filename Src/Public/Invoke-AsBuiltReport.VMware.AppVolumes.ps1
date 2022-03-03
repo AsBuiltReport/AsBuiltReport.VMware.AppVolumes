@@ -24,6 +24,10 @@
         [String] $StylePath
     ) #Close out Param
 
+    # Check if the required version of VMware PowerCLI is installed
+    Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.3'
+
+
     # Import JSON Configuration for Options and InfoLevel
     $Report = $ReportConfig.Report
     $InfoLevel = $ReportConfig.InfoLevel
@@ -109,7 +113,7 @@
 
 
         #---------------------------------------------------------------------------------------------#
-        #                                    AppVolumes Manager General Info                                             #
+        #                                    AppVolumes Manager General Info                          #
         #---------------------------------------------------------------------------------------------#
         
 
