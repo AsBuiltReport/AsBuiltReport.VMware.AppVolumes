@@ -27,8 +27,8 @@ function ConvertTo-TextYN {
 
     switch ($TEXT)
         {
-            "" {"-"}
-            $Null {"-"}
+            "" {"--"}
+            $Null {"--"}
             "True" {"Yes"; break}
             "False" {"No"; break}
             default {$TEXT}
@@ -119,4 +119,40 @@ function ConvertTo-VIobject {
     else {
         return $OBJECT
     }
+} # end
+function ConvertTo-HashToYN {
+    <#
+    .SYNOPSIS
+        Used by As Built Report to convert array content true or false automatically to Yes or No.
+    .DESCRIPTION
+
+    .NOTES
+        Version:        0.1.0
+        Author:         Jonathan Colon
+
+    .EXAMPLE
+
+    .LINK
+
+    #>
+    [CmdletBinding()]
+    [OutputType([Hashtable])]
+    Param (
+        [Parameter (Position = 0, Mandatory)]
+        [AllowEmptyString()]
+        [Hashtable] $TEXT
+    )
+
+    $result = [ordered] @{}
+    foreach($i in $inObj.GetEnumerator()) {
+        try {
+            $result.add($i.Key, (ConvertTo-TextYN $i.Value))
+        }
+        catch {
+            Write-PscriboMessage -IsWarning "Unable to process $($i.key) values"
+        }
+    }
+    if ($result) {
+        return $result
+    } else {return $TEXT}
 } # end

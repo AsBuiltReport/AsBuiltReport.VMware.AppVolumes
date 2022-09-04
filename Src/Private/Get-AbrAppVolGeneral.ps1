@@ -1,4 +1,4 @@
-function Get-AbrAPPVolGeneralInfo {
+function Get-AbrAPPVolGeneral {
     <#
     .SYNOPSIS
         Used by As Built Report to retrieve VMware APPVolume General information.
@@ -39,7 +39,7 @@ function Get-AbrAPPVolGeneralInfo {
                             'Configured' = ConvertTo-TextYN $GeneralAppInfo.configured
                             'Uptime' = $GeneralAppInfo.uptime
                         }
-                        $OutObj = [pscustomobject]$inobj
+                        $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 
                         $TableParams = @{
                             Name = "General Information - $($AppVolServer)"

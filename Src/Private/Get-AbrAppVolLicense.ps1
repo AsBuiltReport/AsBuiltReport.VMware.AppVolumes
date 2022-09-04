@@ -66,7 +66,7 @@ function Get-AbrAPPVolLicense {
                             'Valid Until Date' = $License.license.details.'Valid Until'
                             'Options' = $License.license.details.Options
                         }
-                        $OutObj = [pscustomobject]$inobj
+                        $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 
                         $TableParams = @{
                             Name = "License - $($AppVolServer)"

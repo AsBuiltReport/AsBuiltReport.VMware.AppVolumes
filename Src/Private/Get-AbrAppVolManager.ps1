@@ -48,7 +48,7 @@ function Get-AbrAPPVolManager {
                                     'First Seen At' = $Manager.first_seen_at_human
                                     'Last Seen At' = $Manager.last_seen_at_human
                                 }
-                                $OutObj = [pscustomobject]$inobj
+                                $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 
                                 $TableParams = @{
                                     Name = "Manager Server - $($Manager.name)"

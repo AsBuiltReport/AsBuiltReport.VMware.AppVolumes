@@ -26,7 +26,7 @@
     )
 
     # Check if the required version of VMware PowerCLI is installed
-    Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.7'
+    #Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.7'
 
 
     # Import JSON Configuration for Options and InfoLevel
@@ -46,62 +46,61 @@
     }
 
     foreach ($AppVolServer in $Target) {
-    
+
         Try {
-            $AppVolServerRest = Invoke-RestMethod -SkipCertificateCheck -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds 
-        } Catch { 
+            $AppVolServerRest = Invoke-RestMethod -SkipCertificateCheck -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds
+        } Catch {
             Write-Error $_
-        } 
-        
+        }
+
         # Generate report if connection to AppVolumes Server Connection is successful
         if ($AppVolServerRest.success -eq 'Ok') {
 
             #Environment Varibles
 
-            #Writable Volumes
-            $Writables = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/writables"
-
             #Applications
-            $Applications = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/applications"
+            #$Applications = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/applications"
 
             #Directory Users
-            $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
+            #$ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
 
             #Directory Groups
-            $ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
+            #$ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
 
             #Storage Locations
-            $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
+            #$Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
 
             #Storage Groups
-            $StorageGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
+            #$StorageGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
 
             #AD Domains
-            $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
+            #$LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
 
             #Admin Roles
-            $AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
+            #$AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
 
             #Machine Managers
-            $MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
+            #$MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
 
             #Storage
-            $Storages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
+            #$Storages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
 
             #Settings
-            $Settings = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
+            #$Settings = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
 
-        } 
-        
+        }
+
 
         # Generate report if connection to AppVolumes Manager General Information is successful
         if ($InfoLevel.AppVolumes.General -ge 1) {
-            section -Style Heading1 "VMware AppVolumes - $($AppVolServer)" {        
-                Get-AbrAPPVolGeneralInfo
+            section -Style Heading1 $($AppVolServer) {
+                Get-AbrAPPVolGeneral
                 Get-AbrAPPVolManager
                 Get-AbrAPPVolLicense
                 Get-AbrAPPVolAppstack
                 Get-AbrAppVolWritable
+                Get-AbrAppVolADUser
+                Get-AbrAppVolADGroup
             }
         }
     }

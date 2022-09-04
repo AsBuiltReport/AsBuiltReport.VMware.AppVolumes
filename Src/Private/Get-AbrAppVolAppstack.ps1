@@ -35,10 +35,10 @@ function Get-AbrAPPVolAppstack {
                         $OutObj = @()
                         foreach ($AppStack in $AppStacks.data) {
                             try {
-                                $AppStackID = $appstack.id
-                                $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers" 
-                                $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'} 
-                                
+                                $AppStackID = $AppStack.id
+                                $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
+                                $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
+
                                 $inObj = [ordered] @{
                                     'Name' = $AppStack.Name
                                     'Status' = $AppStack.Status
@@ -47,7 +47,7 @@ function Get-AbrAPPVolAppstack {
                                     'Agent Version' = $AppStackPackage.agent_version
                                     'Applications Count' = $AppStackPackage.programs_count
                                 }
-                                $OutObj += [pscustomobject]$inobj
+                                $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
 
                             }
                             catch {
@@ -62,77 +62,151 @@ function Get-AbrAPPVolAppstack {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj | Table @TableParams
+                        $OutObj | Sort-Object -Property Name | Table @TableParams
                         if ($InfoLevel.AppVolumes.AppStacks -ge 2) {
-                            foreach ($AppStack in $AppStacks.data) {
-                                try {
-                                    section -Style Heading3 "$($AppStack.Name) Details" {
-                                        $OutObj = @()
+                            section -Style Heading3 "AppStacks Details" {
+                                foreach ($AppStack in $AppStacks.data) {
+                                    try {
                                         $AppStackID = $appstack.id
-                                        $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers" 
-                                        $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'} 
-                                        
-                                        $inObj = [ordered] @{
-                                            'Name' = $AppStack.Name
-                                            'Path' = $AppStackPackage.Path
-                                            'Datastore Name' = $AppStackPackage.datastore_Name
-                                            'Status' = $AppStackPackage.Status
-                                            'Created' = $AppStackPackage.created_At_Human
-                                            'Mounted' = $AppStackPackage.mounted_at
-                                            'Size' = $AppStackPackage.size_human
-                                            'Total Assignments' = $AppStackPackage.assignments_Total
-                                            'Attachments Total' = $AppStackPackage.attachments_Total
-                                            'Attachment Limit' = $AppStackPackage.attachment_limit
-                                            'Description' = $AppStackPackage.description
-                                            'Applications Count' = $AppStackPackage.application_count
-                                            'Agent Version' = $AppStackPackage.agent_version
-                                            'Package Agent Version' = $AppStackPackage.capture_version
-                                            'OS Version' = $AppStackPackage.primordial_os_name
-                                            'Provisioning Duration' = $AppStackPackage.provision_duration
-                                        }
-                                        $OutObj = [pscustomobject]$inobj
-
-                                        $TableParams = @{
-                                            Name = "AppStack - $($AppStack.Name)"
-                                            List = $true
-                                            ColumnWidths = 50, 50
-                                        }
-                                        if ($Report.ShowTableCaptions) {
-                                            $TableParams['Caption'] = "- $($TableParams.Name)"
-                                        }
-                                        $OutObj | Table @TableParams
-                                        section -Style Heading4 "Assignment" {
-                                            $OutObj = @()
-                                            $AppStackID = $appstack.id
-                                            $AppStackAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"
-
-                                            foreach ($AppStackAssignment in $AppStackAssignments.data) {
-                                                try {                                                    
-                                                    $inObj = [ordered] @{
-                                                        'Name' = $AppStackAssignment.entities.upn
-                                                        'Type' = $AppStackAssignment.entities.entity_type
-                                                    }
-                                                    $OutObj += [pscustomobject]$inobj
+                                        $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
+                                        $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
+                                        if ($AppStackPackage) {
+                                            section -Style Heading4 "$($AppStack.Name)" {
+                                                $OutObj = @()
+                                                $inObj = [ordered] @{
+                                                    'Name' = $AppStack.Name
+                                                    'Path' = $AppStackPackage.Path
+                                                    'Datastore Name' = $AppStackPackage.datastore_Name
+                                                    'Status' = $AppStackPackage.Status
+                                                    'Created' = $AppStackPackage.created_At_Human
+                                                    'Mounted' = $AppStackPackage.mounted_at
+                                                    'Size' = $AppStackPackage.size_human
+                                                    'Total Assignments' = $AppStackPackage.assignment_count
+                                                    'Attachments Total' = $AppStackPackage.attachment_count
+                                                    'Attachment Limit' = $AppStackPackage.attachment_limit
+                                                    'Description' = $AppStackPackage.description
+                                                    'Applications Count' = $AppStackPackage.programs_count
+                                                    'Agent Version' = $AppStackPackage.agent_version
+                                                    'Package Agent Version' = $AppStackPackage.capture_version
+                                                    'OS Version' = $AppStackPackage.primordial_os_name
+                                                    'Provisioning Duration' = $AppStackPackage.provision_duration
                                                 }
-                                                catch {
+                                                $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
+
+                                                $TableParams = @{
+                                                    Name = "AppStack Details - $($AppStack.Name)"
+                                                    List = $true
+                                                    ColumnWidths = 50, 50
+                                                }
+                                                if ($Report.ShowTableCaptions) {
+                                                    $TableParams['Caption'] = "- $($TableParams.Name)"
+                                                }
+                                                $OutObj | Table @TableParams
+                                                try {
+                                                    $AppStackPackages =  $AppStackIDSource.data
+                                                    if ($AppStackPackage) {
+                                                        section -ExcludeFromTOC -Style Heading5 "Packages" {
+                                                            $OutObj = @()
+                                                            foreach ($Package in $AppStackPackages) {
+                                                                $inObj = [ordered] @{
+                                                                    'Name' = $Package.Name
+                                                                    'Version' = $Package.Version
+                                                                    'Created' = $Package.created_at.Split()[0]
+                                                                    'Mounted' = Switch ($Package.mounted_at) {
+                                                                        $Null {'--'}
+                                                                        default {$Package.mounted_at.ToString('yyyy-mm-dd')}
+                                                                    }
+                                                                    'Size' = $Package.size_human
+                                                                    'Current' = Switch ($Package.app_markers.name) {
+                                                                        $null {'No'}
+                                                                        'CURRENT' {'Yes'}
+                                                                        default {'--'}
+                                                                    }
+                                                                }
+                                                                $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
+                                                            }
+
+                                                            $TableParams = @{
+                                                                Name = "Packages - $($AppStack.Name)"
+                                                                List = $false
+                                                                ColumnWidths = 25, 15, 15, 15, 15, 15
+                                                            }
+                                                            if ($Report.ShowTableCaptions) {
+                                                                $TableParams['Caption'] = "- $($TableParams.Name)"
+                                                            }
+                                                            $OutObj | Sort-Object -Property 'Version' -Descending | Table @TableParams
+                                                            try {
+                                                                $AppStackPackage =  ($AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}).id
+                                                                $AppStackPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"
+                                                                if ($AppStackPrograms) {
+                                                                    section -ExcludeFromTOC -Style Heading6 "Programs" {
+                                                                        $OutObj = @()
+                                                                        foreach ($Program in $AppStackPrograms.data) {
+                                                                            $inObj = [ordered] @{
+                                                                                'Name' = $Program.Name
+                                                                                'Version' = $Program.Version
+                                                                                'Created' = $Program.created_At_Human
+                                                                            }
+                                                                            $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
+                                                                        }
+
+                                                                        $TableParams = @{
+                                                                            Name = "Programs - $($AppStack.Name)"
+                                                                            List = $false
+                                                                            ColumnWidths = 50, 30, 20
+                                                                        }
+                                                                        if ($Report.ShowTableCaptions) {
+                                                                            $TableParams['Caption'] = "- $($TableParams.Name)"
+                                                                        }
+                                                                        $OutObj | Sort-Object -Property 'Name' | Table @TableParams
+                                                                    }
+                                                                }
+                                                            } catch {
+                                                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                            }
+                                                        }
+                                                    }
+                                                } catch {
+                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                }
+                                                try {
+                                                    $AppStackID = $appstack.id
+                                                    $AppStackAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"
+                                                    if ($AppStackAssignments) {
+                                                        section -ExcludeFromTOC -Style Heading5 "Assignment" {
+                                                            $OutObj = @()
+                                                            foreach ($AppStackAssignment in $AppStackAssignments.data) {
+                                                                try {
+                                                                    $inObj = [ordered] @{
+                                                                        'Name' = $AppStackAssignment.entities.upn
+                                                                        'Type' = $AppStackAssignment.entities.entity_type
+                                                                    }
+                                                                    $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
+                                                                }
+                                                                catch {
+                                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                                }
+                                                            }
+
+                                                            $TableParams = @{
+                                                                Name = "Assignment - $($AppStack.Name)"
+                                                                List = $false
+                                                                ColumnWidths = 50, 50
+                                                            }
+                                                            if ($Report.ShowTableCaptions) {
+                                                                $TableParams['Caption'] = "- $($TableParams.Name)"
+                                                            }
+                                                            $OutObj | Sort-Object -Property 'Name' |  Table @TableParams
+                                                        }
+                                                    }
+                                                }  catch {
                                                     Write-PscriboMessage -IsWarning $_.Exception.Message
                                                 }
                                             }
-
-                                            $TableParams = @{
-                                                Name = "Assignment - $($AppStack.Name)"
-                                                List = $false
-                                                ColumnWidths = 50, 50
-                                            }
-                                            if ($Report.ShowTableCaptions) {
-                                                $TableParams['Caption'] = "- $($TableParams.Name)"
-                                            }
-                                            $OutObj | Table @TableParams
                                         }
+                                    }catch {
+                                        Write-PscriboMessage -IsWarning $_.Exception.Message
                                     }
-                                }
-                                catch {
-                                    Write-PscriboMessage -IsWarning $_.Exception.Message
                                 }
                             }
                         }

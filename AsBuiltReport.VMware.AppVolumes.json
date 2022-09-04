@@ -20,7 +20,7 @@
             "AppStacks": 1,
             "ADUsers": 1,
             "ADGroups": 1,
-            "Writeables": 1,
+            "Writables": 1,
             "Applications": 1,
             "StorageLocations": 1,
             "StorageGroups": 1,

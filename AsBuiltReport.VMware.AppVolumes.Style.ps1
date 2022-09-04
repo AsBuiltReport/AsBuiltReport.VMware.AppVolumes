@@ -12,6 +12,7 @@ Style -Name 'Heading 2' -Size 14 -Color '004B6B'
 Style -Name 'Heading 3' -Size 12 -Color '00567A'
 Style -Name 'Heading 4' -Size 11 -Color '00648F'
 Style -Name 'Heading 5' -Size 10 -Color '0072A3'
+Style -Name 'Heading 6' -Size 10 -Color '0072A3'
 Style -Name 'Normal' -Size 10 -Color '565656' -Default
 Style -Name 'Caption' -Size 10 -Color '565656' -Italic -Align Center
 Style -Name 'Header' -Size 10 -Color '565656' -Align Center
