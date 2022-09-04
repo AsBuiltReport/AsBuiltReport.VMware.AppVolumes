@@ -1,13 +1,16 @@
 # :arrows_clockwise: VMware AppVolumes As Built Report Changelog
 
-## [0.1.0] - YYYY-MM-DD
+## [0.2.0] - 2022-0?-??
 
 ### Added
 
-### Changed
+- Migrate report to new module format
+  - Implement better error handling
+- Improve report layout
 
-### Fixed
+## [0.1.0] - 2020-07-06
 
-### Removed
+### Added
 
-
+- Initial Release @childebrandt42
+  - Develop core appvolumes modules and sections
