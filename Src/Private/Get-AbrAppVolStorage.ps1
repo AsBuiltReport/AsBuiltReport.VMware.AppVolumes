@@ -1,7 +1,7 @@
-function Get-AbrAPPVolManager {
+function Get-AbrAppVolStorage {
     <#
     .SYNOPSIS
-        Used by As Built Report to retrieve VMware APPVolume Appstack information.
+        Used by As Built Report to retrieve VMware APPVolume Storage information.
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
@@ -22,36 +22,34 @@ function Get-AbrAPPVolManager {
     )
 
     begin {
-        Write-PScriboMessage "Manager InfoLevel set at $($InfoLevel.AppVolumes.Managers)."
-        Write-PscriboMessage "Collecting Manager information."
+        Write-PScriboMessage "Storage InfoLevel set at $($InfoLevel.AppVolumes.Storage)."
+        Write-PscriboMessage "Collecting Active Directory Domain information."
     }
 
     process {
-        if ($InfoLevel.AppVolumes.Managers -ge 1) {
+        if ($InfoLevel.AppVolumes.Storage -ge 1) {
             try {
-                $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
-                if ($Managers) {
-                    $OutObj = @()
-                    section -Style Heading2 "Manager Servers" {
-                        foreach($Manager in $Managers.services) {
-                            section -Style Heading2 $Manager.name {
+                $Storages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
+                if ($Storages) {
+                    section -Style Heading2 "Storage" {
+                        $OutObj = @()
+                        foreach ($Storage in $Storages.Storages) {
+                            section -Style Heading3 $Storage.Name {
                                 try {
                                     $inObj = [ordered] @{
-                                        'Internal Version' = $Manager.internal_version
-                                        'Product Version' = $Manager.product_version
-                                        'Domain Name' = $Manager.domain_name
-                                        'Computer Name' = $Manager.computer_name
-                                        'Computer FQDN' = $Manager.fqdn
-                                        'Registered' = ConvertTo-TextYN $Manager.registered
-                                        'Secure' = ConvertTo-TextYN $Manager.secure
-                                        'Status' = $Manager.status
-                                        'First Seen At' = $Manager.first_seen_at_human
-                                        'Last Seen At' = $Manager.last_seen_at_human
+                                        'Host' = $Storage.host
+                                        'Space Users' = $Storage.space_used
+                                        'Space Total' = $Storage.space_total
+                                        "Number of AppStack's" = $Storage.num_appstacks
+                                        "Number of Writable's" = $Storage.num_writables
+                                        'Storage Attachable' = $Storage.attachable
+                                        'Storage Created Date' = $Storage.created_at_human
+                                        'Storage Status' = $Storage.status
                                     }
                                     $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 
                                     $TableParams = @{
-                                        Name = "Manager Server - $($Manager.name)"
+                                        Name = "Storage - $($Storage.Name)"
                                         List = $true
                                         ColumnWidths = 50, 50
                                     }

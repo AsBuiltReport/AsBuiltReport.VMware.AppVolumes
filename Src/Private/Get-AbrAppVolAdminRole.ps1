@@ -1,7 +1,7 @@
-function Get-AbrAppVolADGroup {
+function Get-AbrAppVolAdminRole {
     <#
     .SYNOPSIS
-        Used by As Built Report to retrieve VMware APPVolume Active Directory groups information.
+        Used by As Built Report to retrieve VMware APPVolume Administrator Roles information.
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
@@ -22,26 +22,24 @@ function Get-AbrAppVolADGroup {
     )
 
     begin {
-        Write-PScriboMessage "ADGroups InfoLevel set at $($InfoLevel.AppVolumes.ADGroups)."
-        Write-PscriboMessage "Collecting Active Directory Group information."
+        Write-PScriboMessage "AdminGroups InfoLevel set at $($InfoLevel.AppVolumes.AdminGroups)."
+        Write-PscriboMessage "Collecting Administrator Roles information."
     }
 
     process {
-        if ($InfoLevel.AppVolumes.ADGroups -ge 1) {
+        if ($InfoLevel.AppVolumes.AdminGroups -ge 1) {
             try {
-                 $ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
-                if ($ActiveDirectoryGroups) {
-                    section -Style Heading2 "Managed Groups" {
+                $AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
+                if ($AdminGroups) {
+                    section -Style Heading2 "Administrator Roles" {
                         $OutObj = @()
-                        foreach ($ActiveDirectoryGroup in $ActiveDirectoryGroups.groups) {
+                        foreach ($AdminGroup in $AdminGroups.group_permissions) {
                             try {
                                 $inObj = [ordered] @{
-                                    'Name' = $ActiveDirectoryGroup.Name
-                                    'Last Logon' = $ActiveDirectoryGroup.last_login_human.split()[0,1,2] -join ' '
-                                    'Status' = $ActiveDirectoryGroup.status
-                                    'Writable' = $ActiveDirectoryGroup.writables
-                                    'AppStack' = $ActiveDirectoryGroup.appstacks
-                                    'Assignments' = $ActiveDirectoryGroup.application_assignment_count
+                                    'Group UPN' = $AdminGroup.assignee_upn
+                                    'Role' = $AdminGroup.Role
+                                    'Type' = $AdminGroup.assignee_type
+                                    'Created at' = ([DateTime]$AdminGroup.created_at).ToShortDateString()
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                             }
@@ -51,9 +49,9 @@ function Get-AbrAppVolADGroup {
                         }
 
                         $TableParams = @{
-                            Name = "Managed Groups - $($AppVolServer)"
+                            Name = "Administrators Roles - $($AppVolServer)"
                             List = $false
-                            ColumnWidths = 30, 16, 16, 12, 12, 14
+                            ColumnWidths = 40, 30, 15, 15
                         }
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"

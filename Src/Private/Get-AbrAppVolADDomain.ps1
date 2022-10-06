@@ -1,7 +1,7 @@
-function Get-AbrAPPVolManager {
+function Get-AbrAppVolADDomain {
     <#
     .SYNOPSIS
-        Used by As Built Report to retrieve VMware APPVolume Appstack information.
+        Used by As Built Report to retrieve VMware APPVolume AD Domain information.
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
@@ -22,36 +22,36 @@ function Get-AbrAPPVolManager {
     )
 
     begin {
-        Write-PScriboMessage "Manager InfoLevel set at $($InfoLevel.AppVolumes.Managers)."
-        Write-PscriboMessage "Collecting Manager information."
+        Write-PScriboMessage "ADDomains InfoLevel set at $($InfoLevel.AppVolumes.ADDomains)."
+        Write-PscriboMessage "Collecting Active Directory Domain information."
     }
 
     process {
-        if ($InfoLevel.AppVolumes.Managers -ge 1) {
+        if ($InfoLevel.AppVolumes.ADDomains -ge 1) {
             try {
-                $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
-                if ($Managers) {
-                    $OutObj = @()
-                    section -Style Heading2 "Manager Servers" {
-                        foreach($Manager in $Managers.services) {
-                            section -Style Heading2 $Manager.name {
+                $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
+                if ($LDAPDomains) {
+                    section -Style Heading2 "Active Directory Domain" {
+                        $OutObj = @()
+                        foreach ($LDAPDomain in $LDAPDomains.ldap_domains) {
+                            section -Style Heading3 $LDAPDomain.domain {
                                 try {
                                     $inObj = [ordered] @{
-                                        'Internal Version' = $Manager.internal_version
-                                        'Product Version' = $Manager.product_version
-                                        'Domain Name' = $Manager.domain_name
-                                        'Computer Name' = $Manager.computer_name
-                                        'Computer FQDN' = $Manager.fqdn
-                                        'Registered' = ConvertTo-TextYN $Manager.registered
-                                        'Secure' = ConvertTo-TextYN $Manager.secure
-                                        'Status' = $Manager.status
-                                        'First Seen At' = $Manager.first_seen_at_human
-                                        'Last Seen At' = $Manager.last_seen_at_human
+                                        'Username' = $LDAPDomain.username
+                                        'Base' = $LDAPDomain.base
+                                        'NetBIOS' = $LDAPDomain.netbios
+                                        'LDAPS' = $LDAPDomain.ldaps
+                                        'LDAP_TLS' = $LDAPDomain.ldap_tls
+                                        'SSL Verify' = $LDAPDomain.ssl_verify
+                                        'Port' = $LDAPDomain.port
+                                        'Effective Port' = $LDAPDomain.effective_port
+                                        'Created At' = $LDAPDomain.created_at
+                                        'Updated At' = $LDAPDomain.updated_at
                                     }
                                     $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 
                                     $TableParams = @{
-                                        Name = "Manager Server - $($Manager.name)"
+                                        Name = "Active Directory Domains - $($LDAPDomain.domain)"
                                         List = $true
                                         ColumnWidths = 50, 50
                                     }

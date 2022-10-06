@@ -55,52 +55,24 @@
 
         # Generate report if connection to AppVolumes Server Connection is successful
         if ($AppVolServerRest.success -eq 'Ok') {
-
-            #Environment Varibles
-
-            #Applications
-            #$Applications = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/applications"
-
-            #Directory Users
-            #$ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
-
-            #Directory Groups
-            #$ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
-
-            #Storage Locations
-            #$Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
-
-            #Storage Groups
-            #$StorageGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
-
-            #AD Domains
-            #$LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
-
-            #Admin Roles
-            #$AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
-
-            #Machine Managers
-            #$MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
-
-            #Storage
-            #$Storages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
-
-            #Settings
-            #$Settings = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
-
-        }
-
-
-        # Generate report if connection to AppVolumes Manager General Information is successful
-        if ($InfoLevel.AppVolumes.General -ge 1) {
-            section -Style Heading1 $($AppVolServer) {
-                Get-AbrAPPVolGeneral
-                Get-AbrAPPVolManager
-                Get-AbrAPPVolLicense
-                Get-AbrAPPVolAppstack
-                Get-AbrAppVolWritable
-                Get-AbrAppVolADUser
-                Get-AbrAppVolADGroup
+            # Generate report if connection to AppVolumes Manager General Information is successful
+            if ($InfoLevel.AppVolumes.General -ge 1) {
+                section -Style Heading1 $($AppVolServer) {
+                    Get-AbrAPPVolGeneral
+                    Get-AbrAPPVolManager
+                    Get-AbrAPPVolLicense
+                    Get-AbrAPPVolAppstack
+                    Get-AbrAppVolWritable
+                    Get-AbrAppVolADUser
+                    Get-AbrAppVolADGroup
+                    Get-AbrAppVolDatastore
+                    Get-AbrAppVolStorageGroup
+                    Get-AbrAppVolADDomain
+                    Get-AbrAppVolAdminRole
+                    Get-AbrAppVolMachineManager
+                    Get-AbrAppVolStorage
+                    Get-AbrAppVolSetting
+                }
             }
         }
     }
