@@ -31,14 +31,13 @@ function Get-AbrAppVolMachineManager {
             try {
                 $MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
                 if ($MachineManagers) {
-                    section -Style Heading2 "Machine Manager" {
+                    section -Style Heading3 "Machine Manager" {
                         $OutObj = @()
-                        foreach ($MachineManager in $MachineManagers.machine_managers) {
+                        foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
                             section -Style Heading3 $MachineManager.host {
                                 $MachineManagerDetail = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers/$($MachineManager.id)"
                                 try {
                                     $inObj = [ordered] @{
-                                        "Description" = $MachineManagerDetail.machine_manager.description
                                         'Username' = $MachineManager.Username
                                         "Host Username" = $MachineManagerDetail.machine_manager.host_username
                                         'Type' = $MachineManager.type
@@ -49,8 +48,7 @@ function Get-AbrAppVolMachineManager {
                                         "Mount Queues" = $MachineManagerDetail.machine_manager.settings.use_reconfig_queues
                                         "Mount Async" = $MachineManagerDetail.machine_manager.settings.use_async
                                         "Mount Throttle" = $MachineManagerDetail.machine_manager.settings.concurrent_reconfigs
-
-
+                                        "Description" = $MachineManagerDetail.machine_manager.description
                                     }
                                     $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
                                 }

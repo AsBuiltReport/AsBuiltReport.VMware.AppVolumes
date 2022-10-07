@@ -34,9 +34,6 @@
     $InfoLevel = $ReportConfig.InfoLevel
     $Options = $ReportConfig.Options
 
-    # If custom style not set, use default style
-
-
     $RESTAPIUser = $Credential.UserName
     $RESTAPIPassword = $Credential.GetNetworkCredential().password
 
@@ -58,20 +55,32 @@
             # Generate report if connection to AppVolumes Manager General Information is successful
             if ($InfoLevel.AppVolumes.General -ge 1) {
                 section -Style Heading1 $($AppVolServer) {
+                    Paragraph "The following section provides a summary of the implemented components on the VMware App Volumes infrastructure."
                     Get-AbrAPPVolGeneral
-                    Get-AbrAPPVolManager
-                    Get-AbrAPPVolLicense
-                    Get-AbrAPPVolAppstack
-                    Get-AbrAppVolWritable
-                    Get-AbrAppVolADUser
-                    Get-AbrAppVolADGroup
-                    Get-AbrAppVolDatastore
-                    Get-AbrAppVolStorageGroup
-                    Get-AbrAppVolADDomain
-                    Get-AbrAppVolAdminRole
-                    Get-AbrAppVolMachineManager
-                    Get-AbrAppVolStorage
-                    Get-AbrAppVolSetting
+                    section -Style Heading2 "Inventory" {
+                        Get-AbrAppVolAppstack
+                        Get-AbrAppVolWritable
+                    }
+                    section -Style Heading2 "Directory" {
+                        Get-AbrAppVolADUser
+                        Get-AbrAppVolADGroup
+                        Get-AbrAppVolADOU
+                    }
+                    section -Style Heading2 "Infrastructure" {
+                        Get-AbrAppVolStorage
+                        Get-AbrAppVolStorageGroup
+                    }
+                    section -Style Heading2 "Configuration" {
+                        Paragraph "The following section details configuration settings for App Volumes Manager $($AppVolServer.split('.')[0])."
+                        Blankline
+                        Get-AbrAppVolLicense
+                        Get-AbrAppVolADDomain
+                        Get-AbrAppVolAdminRole
+                        Get-AbrAppVolMachineManager
+                        Get-AbrAppVolDatastore
+                        Get-AbrAPPVolManager
+                        Get-AbrAppVolSetting
+                    }
                 }
             }
         }

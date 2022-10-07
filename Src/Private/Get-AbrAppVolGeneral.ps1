@@ -33,6 +33,8 @@ function Get-AbrAPPVolGeneral {
                 if ($GeneralAppInfo) {
                     $OutObj = @()
                     section -Style Heading2 "General Information" {
+                        Paragraph "The following section provide a summary of common information on $($AppVolServer.split('.')[0])."
+                        Blankline
                         $inObj = [ordered] @{
                             'Name' = $AppVolServer
                             'Version' = $GeneralAppInfo.version

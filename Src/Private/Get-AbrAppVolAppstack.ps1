@@ -31,7 +31,9 @@ function Get-AbrAPPVolAppstack {
             try {
                 $AppStacks = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products"
                 if ($AppStacks) {
-                    section -Style Heading2 'AppStacks Summary' {
+                    section -Style Heading3 'AppStacks Summary' {
+                        Paragraph "The following section provide a summary of the AppStacks components on $($AppVolServer.split('.')[0])."
+                        Blankline
                         $OutObj = @()
                         foreach ($AppStack in $AppStacks.data) {
                             try {
@@ -64,14 +66,16 @@ function Get-AbrAPPVolAppstack {
                         }
                         $OutObj | Sort-Object -Property Name | Table @TableParams
                         if ($InfoLevel.AppVolumes.AppStacks -ge 2) {
-                            section -Style Heading3 "AppStacks Details" {
-                                foreach ($AppStack in $AppStacks.data) {
+                            section -Style Heading4 "AppStacks Details" {
+                                Paragraph "The following section details AppStacks configuration information on $($AppVolServer.split('.')[0])."
+                                Blankline
+                                foreach ($AppStack in $AppStacks.data | Sort-Object -Property Name) {
                                     try {
                                         $AppStackID = $appstack.id
                                         $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
                                         $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
                                         if ($AppStackPackage) {
-                                            section -Style Heading4 "$($AppStack.Name)" {
+                                            section -Style Heading5 "$($AppStack.Name)" {
                                                 $OutObj = @()
                                                 $inObj = [ordered] @{
                                                     'Name' = $AppStack.Name
@@ -105,7 +109,7 @@ function Get-AbrAPPVolAppstack {
                                                 try {
                                                     $AppStackPackages =  $AppStackIDSource.data
                                                     if ($AppStackPackage) {
-                                                        section -ExcludeFromTOC -Style Heading5 "Packages" {
+                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Packages" {
                                                             $OutObj = @()
                                                             foreach ($Package in $AppStackPackages) {
                                                                 $inObj = [ordered] @{
@@ -139,7 +143,7 @@ function Get-AbrAPPVolAppstack {
                                                                 $AppStackPackage =  ($AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}).id
                                                                 $AppStackPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"
                                                                 if ($AppStackPrograms) {
-                                                                    section -ExcludeFromTOC -Style Heading6 "Programs" {
+                                                                    section -ExcludeFromTOC -Style NOTOCHeading6 "Programs" {
                                                                         $OutObj = @()
                                                                         foreach ($Program in $AppStackPrograms.data) {
                                                                             $inObj = [ordered] @{
@@ -173,7 +177,7 @@ function Get-AbrAPPVolAppstack {
                                                     $AppStackID = $appstack.id
                                                     $AppStackAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"
                                                     if ($AppStackAssignments) {
-                                                        section -ExcludeFromTOC -Style Heading5 "Assignment" {
+                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Assignment" {
                                                             $OutObj = @()
                                                             foreach ($AppStackAssignment in $AppStackAssignments.data) {
                                                                 try {

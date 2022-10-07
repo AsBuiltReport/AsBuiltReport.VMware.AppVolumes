@@ -31,9 +31,9 @@ function Get-AbrAppVolADDomain {
             try {
                 $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
                 if ($LDAPDomains) {
-                    section -Style Heading2 "Active Directory Domain" {
+                    section -Style Heading3 "Active Directory Domain" {
                         $OutObj = @()
-                        foreach ($LDAPDomain in $LDAPDomains.ldap_domains) {
+                        foreach ($LDAPDomain in $LDAPDomains.ldap_domains | Sort-Object -Property Domain) {
                             section -Style Heading3 $LDAPDomain.domain {
                                 try {
                                     $inObj = [ordered] @{

@@ -32,7 +32,7 @@ function Get-AbrAPPVolLicense {
                 $License = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license"
                 if ($License) {
                     $OutObj = @()
-                    section -Style Heading2 "License Information" {
+                    section -Style Heading3 "License Information" {
                         Switch ($License.license.invalid)
                         {
                             'True' {$LicenseInvalid = 'False' }

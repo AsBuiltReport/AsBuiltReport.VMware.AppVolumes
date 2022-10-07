@@ -31,7 +31,7 @@ function Get-AbrAppVolAdminRole {
             try {
                 $AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
                 if ($AdminGroups) {
-                    section -Style Heading2 "Administrator Roles" {
+                    section -Style Heading3 "Administrator Roles" {
                         $OutObj = @()
                         foreach ($AdminGroup in $AdminGroups.group_permissions) {
                             try {
@@ -56,7 +56,7 @@ function Get-AbrAppVolAdminRole {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj | Table @TableParams
+                        $OutObj| Sort-Object -Property assignee_upn | Table @TableParams
                     }
                 }
             }

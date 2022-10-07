@@ -31,7 +31,7 @@ function Get-AbrAppVolSetting {
             try {
                 $Settings = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
                 if ($Settings) {
-                    section -Style Heading2 "Settings" {
+                    section -Style Heading3 "Settings" {
                         $OutObj = @()
                         try {
                             foreach($Setting in $Settings.data.setting){
@@ -39,19 +39,19 @@ function Get-AbrAppVolSetting {
                                     $UISessionTimeout = $Setting.value
                                 }
                                 #Regular Backups
-                                if($Setting.key -eq "enable_writable_recurrent_backup"){
+                                if($Setting.key -eq "enable_data_disk_recurrent_backup"){
                                     $RegularBackups = $Setting.value
                                 }
                                 #Regular Backups Days
-                                if($Setting.key -eq "writable_backup_recurrent_interval"){
+                                if($Setting.key -eq "data_disk_backup_recurrent_interval"){
                                     $RegularBackupsInterval = $Setting.value
                                 }
                                 # Backup Storage Location
-                                if($Setting.key -eq "writable_backup_recurrent_datastore"){
+                                if($Setting.key -eq "data_disk_backup_recurrent_datastore"){
                                     $StorageLocation = $Setting.value
                                 }
                                 # Backup Storage Path
-                                if($Setting.key -eq "writable_backup_recurrent_path"){
+                                if($Setting.key -eq "data_disk_backup_recurrent_path"){
                                     $StoragePath = $Setting.value
                                 }
                                 # Backup Storage Path
@@ -75,17 +75,33 @@ function Get-AbrAppVolSetting {
                                 if($Setting.key -eq "DISABLE_TOKEN_AD_QUERY"){
                                     $DisableTokenADQuery = $Setting.value
                                 }
+                                if($Setting.key -eq "JOIN_CEIP"){
+                                    $DisableJOINCEIP = $Setting.value
+                                }
+                                if($Setting.key -eq "ENABLE_ALLOW_PACKAGE_DELIVERY_TO_ANY_OS"){
+                                    $DisableDELIVERYTOANYOS = $Setting.value
+                                }
+                                if($Setting.key -eq "ENABLE_2X_VOLUMES"){
+                                    $Disable2XVolumes = $Setting.value
+                                }
+                                if($Setting.key -eq "disable_agent_session_cookie"){
+                                    $DisableAgentSessionCookie = $Setting.value
+                                }
                             }
 
                             $inObj = [ordered] @{
                                 'UI Session Timeout' = $UISessionTimeout
                                 'Non-Domain Entities' = $NonDomainEntities
                                 'Writeable Volumes Regular Backups' = $RegularBackups
-                                'Writeable Volumes Regular Backups Interval' = $RegularBackupsInterval
+                                'Writeable Volumes Regular Backups Interval' = "$($RegularBackupsInterval) days"
                                 'Writeable Volumes Storage Location' = $DatastoreBackupName
                                 'Writeable Volumes Storage Path' = $StoragePath
+                                'Disable Agent Session Cookie' = $DisableAgentSessionCookie
                                 'Disable Volume Cache' = $DisableSnapVolumeCache
                                 'Disable Token AD Query' = $DisableTokenADQuery
+                                'Enable Volumes (2.x)' = $Disable2XVolumes
+                                'Allow package delivery to any operating system' = $DisableDELIVERYTOANYOS
+                                'Join the VMware CEIP' = $DisableJOINCEIP
                             }
                             $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 

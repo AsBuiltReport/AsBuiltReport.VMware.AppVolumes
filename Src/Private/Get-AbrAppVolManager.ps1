@@ -32,13 +32,13 @@ function Get-AbrAPPVolManager {
                 $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
                 if ($Managers) {
                     $OutObj = @()
-                    section -Style Heading2 "Manager Servers" {
-                        foreach($Manager in $Managers.services) {
-                            section -Style Heading2 $Manager.name {
+                    section -Style Heading3 "Manager Servers" {
+                        foreach($Manager in $Managers.services | Sort-Object -Property Name) {
+                            section -Style Heading4 $Manager.name {
                                 try {
                                     $inObj = [ordered] @{
-                                        'Internal Version' = $Manager.internal_version
                                         'Product Version' = $Manager.product_version
+                                        'Internal Version' = $Manager.internal_version
                                         'Domain Name' = $Manager.domain_name
                                         'Computer Name' = $Manager.computer_name
                                         'Computer FQDN' = $Manager.fqdn

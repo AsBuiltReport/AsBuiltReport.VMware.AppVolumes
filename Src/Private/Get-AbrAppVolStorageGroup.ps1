@@ -31,9 +31,11 @@ function Get-AbrAppVolStorageGroup {
             try {
                 $StorageGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
                 if ($StorageGroups) {
-                    section -Style Heading2 "Storage Groups" {
+                    section -Style Heading3 "Storage Groups" {
+                        Paragraph "The following section details Storage Group used to define groups of storage locations so they can function as one storage entity."
+                        BlankLine
                         $OutObj = @()
-                        foreach ($StorageGroup in $StorageGroups.storage_groups) {
+                        foreach ($StorageGroup in $StorageGroups.storage_groups | Sort-Object -Property Name) {
                             section -Style Heading3 $StorageGroup.name {
                                 try {
                                     $inObj = [ordered] @{
@@ -61,6 +63,38 @@ function Get-AbrAppVolStorageGroup {
                                         $TableParams['Caption'] = "- $($TableParams.Name)"
                                     }
                                     $OutObj | Table @TableParams
+                                    $StorageGroupDetails = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups/$($StorageGroup.id)"
+                                    if ($StorageGroupDetails) {
+                                        section -ExcludeFromTOC -Style NOTOCHeading4 'Datastore Members' {
+                                            $OutObj = @()
+                                            foreach ($StorageGroupDetail in $StorageGroupDetails.storage_group.storages) {
+                                                try {
+                                                    $inObj = [ordered] @{
+                                                        'Name' = $StorageGroupDetail.Name
+                                                        'DataCenter' = $StorageGroupDetail.datacenter
+                                                        'Space Used' = $StorageGroupDetail.space_used
+                                                        'Space Total' = $StorageGroupDetail.space_total
+                                                        'Is Deleted' = $StorageGroupDetail.deleted
+                                                    }
+                                                    $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
+
+                                                }
+                                                catch {
+                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                }
+                                            }
+
+                                            $TableParams = @{
+                                                Name = "Datastore Members - $($StorageGroup.name)"
+                                                List = $false
+                                                ColumnWidths = 30, 30, 14, 13, 13
+                                            }
+                                            if ($Report.ShowTableCaptions) {
+                                                $TableParams['Caption'] = "- $($TableParams.Name)"
+                                            }
+                                            $OutObj| Sort-Object -Property Name | Table @TableParams
+                                        }
+                                    }
                                 }
                                 catch {
                                     Write-PscriboMessage -IsWarning $_.Exception.Message

@@ -31,7 +31,9 @@ function Get-AbrAppVolWritable {
             try {
                 $Writables = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/writables"
                 if ($Writables) {
-                    section -Style Heading2 "Writable AppStack" {
+                    section -Style Heading3 "Writable AppStack" {
+                        Paragraph "The following section provide a summary of Writable AppStack components on $($AppVolServer.split('.')[0])."
+                        Blankline
                         $OutObj = @()
                         foreach ($Writable in $Writables.data) {
                             try {
@@ -57,12 +59,14 @@ function Get-AbrAppVolWritable {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj | Table @TableParams
+                        $OutObj | Sort-Object -Property Name | Table @TableParams
                         if ($InfoLevel.AppVolumes.Writables -ge 2) {
-                            section -Style Heading3 "Writable AppStack Details" {
-                                foreach ($Writable in $Writables.data) {
+                            section -Style Heading4 "Writable AppStack Details" {
+                                Paragraph "The following section details Writable AppStack settings configured on $($AppVolServer.split('.')[0])."
+                                Blankline
+                                foreach ($Writable in $Writables.data | Sort-Object -Property Name) {
                                     try {
-                                        section -ExcludeFromTOC -Style Heading4 $Writable.Name {
+                                        section -ExcludeFromTOC -Style NOTOCHeading5 $Writable.Name {
                                             $inObj = [ordered] @{
                                                 'Owner' = $Writable.Owner_name
                                                 'Owner Type' = $Writable.Owner_Type
