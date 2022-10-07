@@ -62,7 +62,7 @@ function Get-AbrAppVolStorage {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
                         $OutObj | Sort-Object -Property Name |  Table @TableParams
-                        if ($InfoLevel.AppVolumes.Storage -ge 2) {
+                        if ($InfoLevel.AppVolumes.StorageLocations -ge 2) {
                             $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
                             if ($Datastores) {
                                 section -Style Heading4 "Storage Details" {

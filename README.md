@@ -43,7 +43,7 @@ Below are the instructions on how to install, configure and generate a VMware Ap
 <!-- ********** Update supported AppVolumes versions ********** -->
 The VMware AppVolumes As Built Report supports the following AppVolumes versions;
 
-- Should work on versions 2.x. Has been tested on 2.14 through 2.18.4 and Version 4.0.0 and 4.0.1
+- Should work on version 4.+
 
 ### PowerShell
 This report is compatible with the following PowerShell versions;
@@ -56,6 +56,7 @@ This report is compatible with the following PowerShell versions;
 <!-- ********** Update system requirements ********** -->
 PowerShell 5.1 or PowerShell 7, and the following PowerShell modules are required for generating a VMware AppVolumes As Built Report.
 
+- [VMware PowerCLI Module](https://www.powershellgallery.com/packages/VMware.PowerCLI/)
 - [AsBuiltReport.VMware.AppVolumes Module](https://www.powershellgallery.com/packages/AsBuiltReport.VMware.AppVolumes/)
 
 ### Linux & macOS
@@ -142,16 +143,16 @@ General | 1 | 1 |
 Managers | 1 | 1 |
 License | 1 | 1 |
 AppStacks | 1 | 2 |
-ADUsers | 1 | 2 |
-ADGroups | 1 | 2 |
+ADUsers | 1 | 1 |
+ADGroups | 1 | 1 |
+ADOUs | 1 | 1 |
 Writeables | 1 | 2 |
-Applications | 1 | 2 |
 StorageLocations | 1 | 2 |
-StorageGroups | 1 | 2 |
-ADDomains | 1 | 2 |
-AdminGroups | 1 | 2 |
-MachineManagers | 1 | 2 |
-Storage | 1 | 2 |
+StorageGroups | 1 | 1 |
+ADDomains | 1 | 1 |
+AdminGroups | 1 | 1 |
+MachineManagers | 1 | 1 |
+Storage | 1 | 1 |
 Settings | 1 | 1 |
 
 ### Healthcheck

@@ -25,9 +25,13 @@
         [String] $StylePath
     )
 
-    # Check if the required version of VMware PowerCLI is installed
-    #Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.7'
+    Write-PScriboMessage -IsWarning "Please refer to the AsBuiltReport.VMware.AppVolumes github website for more detailed information about this project."
+    Write-PScriboMessage -IsWarning "Do not forget to update your report configuration file after each new version release."
+    Write-PScriboMessage -IsWarning "Documentation: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes"
+    Write-PScriboMessage -IsWarning "Issues or bug reporting: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/issues"
 
+    # Check if the required version of VMware PowerCLI is installed
+    Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.7'
 
     # Import JSON Configuration for Options and InfoLevel
     $Report = $ReportConfig.Report
