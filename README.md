@@ -163,6 +163,8 @@ Settings | 1 | 1 |
 ### Healthcheck
 The **Healthcheck** schema is used to toggle health checks on or off.
 
+Health checks are yet to be developed.
+
 ## :computer: Examples
 
 ```powershell
