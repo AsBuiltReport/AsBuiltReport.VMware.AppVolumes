@@ -4,9 +4,10 @@
 
 ### Added
 
-- Added packgaes and programs to the AppStacks section
-- Addd managed OUs to the Directory section
+- Added packages and programs to the AppStacks section
+- Added managed OUs to the Directory section
 - Added Datastore Members table to the Storage Groups section
+- Enhance SSL certificate validation on PSv5.1
 
 ### Changed
 

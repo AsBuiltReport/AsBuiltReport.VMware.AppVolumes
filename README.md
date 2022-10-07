@@ -36,6 +36,14 @@ VMware AppVolumes As Built Report is a PowerShell module which works in conjunct
 
 Please refer to the AsBuiltReport [website](https://www.asbuiltreport.com) for more detailed information about this project.
 
+# :books: Sample Reports
+
+## Sample Report - Custom Style
+
+Sample VMware AppVolumes As Built report HTML file: [Sample VMware AppVolumes As Built Report.html](https://htmlpreview.github.io/?https://raw.githubusercontent.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/dev/Samples/Sample%20VMware%20AppVolumes%20As%20Built%20Report.html)
+
+Sample VMware AppVolumes As Built report PDF file: [Sample VMware AppVolumes As Built Report.pdf](https://raw.githubusercontent.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/dev/Samples/Sample%20VMware%20AppVolumes%20As%20Built%20Report.pdf)
+
 # :beginner: Getting Started
 Below are the instructions on how to install, configure and generate a VMware AppVolumes As Built report.
 
