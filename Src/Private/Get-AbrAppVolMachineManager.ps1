@@ -29,13 +29,19 @@ function Get-AbrAppVolMachineManager {
     process {
         if ($InfoLevel.AppVolumes.MachineManagers -ge 1) {
             try {
-                $MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
+                } else {$MachineManagers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"}
+
                 if ($MachineManagers) {
                     section -Style Heading3 "Machine Manager" {
                         $OutObj = @()
                         foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
                             section -Style Heading3 $MachineManager.host {
-                                $MachineManagerDetail = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers/$($MachineManager.id)"
+                                if ($PSVersionTable.PSEdition -eq 'Core') {
+                                    $MachineManagerDetail = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers/$($MachineManager.id)"
+                                } else {$MachineManagerDetail = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers/$($MachineManager.id)"}
+
                                 try {
                                     $inObj = [ordered] @{
                                         'Username' = $MachineManager.Username

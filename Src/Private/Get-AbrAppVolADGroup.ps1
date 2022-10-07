@@ -29,7 +29,9 @@ function Get-AbrAppVolADGroup {
     process {
         if ($InfoLevel.AppVolumes.ADGroups -ge 1) {
             try {
-                 $ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
+                } else {$ActiveDirectoryGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"}
                 if ($ActiveDirectoryGroups) {
                     section -Style Heading3 "Managed Groups" {
                         Paragraph "The following section provide a summary of Groups that have assignments on $($AppVolServer.split('.')[0])."

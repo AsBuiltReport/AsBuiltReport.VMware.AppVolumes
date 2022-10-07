@@ -29,7 +29,9 @@ function Get-AbrAPPVolGeneral {
     process {
         if ($InfoLevel.AppVolumes.General -ge 1) {
             try {
-                $GeneralAppInfo = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $GeneralAppInfo = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"
+                } else {$GeneralAppInfo = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"}
                 if ($GeneralAppInfo) {
                     $OutObj = @()
                     section -Style Heading2 "General Information" {

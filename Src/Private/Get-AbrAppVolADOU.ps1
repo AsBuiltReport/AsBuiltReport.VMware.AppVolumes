@@ -29,7 +29,10 @@ function Get-AbrAppVolADOU {
     process {
         if ($InfoLevel.AppVolumes.ADOus -ge 1) {
             try {
-                $ActiveDirectoryOUs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/org_units"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $ActiveDirectoryOUs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/org_units"
+                } else {$ActiveDirectoryOUs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/org_units"}
+
                 if ($ActiveDirectoryOUs) {
                     section -Style Heading3 "Managed OUs" {
                         Paragraph "The following section provide a summary of Organizational Units (OUs) that have assignments on $($AppVolServer.split('.')[0])."

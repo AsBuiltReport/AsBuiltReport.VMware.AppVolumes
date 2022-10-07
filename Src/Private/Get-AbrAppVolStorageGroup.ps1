@@ -29,7 +29,10 @@ function Get-AbrAppVolStorageGroup {
     process {
         if ($InfoLevel.AppVolumes.StorageGroups -ge 1) {
             try {
-                $StorageGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $StorageGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
+                } else {$StorageGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"}
+
                 if ($StorageGroups) {
                     section -Style Heading3 "Storage Groups" {
                         Paragraph "The following section details Storage Group used to define groups of storage locations so they can function as one storage entity."
@@ -63,7 +66,10 @@ function Get-AbrAppVolStorageGroup {
                                         $TableParams['Caption'] = "- $($TableParams.Name)"
                                     }
                                     $OutObj | Table @TableParams
-                                    $StorageGroupDetails = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups/$($StorageGroup.id)"
+                                    if ($PSVersionTable.PSEdition -eq 'Core') {
+                                        $StorageGroupDetails = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups/$($StorageGroup.id)"
+                                    } else {$StorageGroupDetails = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups/$($StorageGroup.id)"}
+
                                     if ($StorageGroupDetails) {
                                         section -ExcludeFromTOC -Style NOTOCHeading4 'Datastore Members' {
                                             $OutObj = @()

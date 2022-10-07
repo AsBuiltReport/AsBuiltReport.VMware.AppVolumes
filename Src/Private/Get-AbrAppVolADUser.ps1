@@ -29,7 +29,10 @@ function Get-AbrAppVolADUser {
     process {
         if ($InfoLevel.AppVolumes.ADUsers -ge 1) {
             try {
-                $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
+                } else {$ActiveDirectoryUsers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"}
+
                 if ($ActiveDirectoryUsers) {
                     section -Style Heading3 "Managed Users" {
                         Paragraph "The following section provide a summary of Users who have logged-in to a managed computer or have assignments on $($AppVolServer.split('.')[0])."

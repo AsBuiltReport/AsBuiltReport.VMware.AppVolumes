@@ -29,7 +29,10 @@ function Get-AbrAPPVolAppstack {
     process {
         if ($InfoLevel.AppVolumes.AppStacks -ge 1) {
             try {
-                $AppStacks = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $AppStacks = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products"
+                } else {$AppStacks = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products"}
+
                 if ($AppStacks) {
                     section -Style Heading3 'AppStacks Summary' {
                         Paragraph "The following section provide a summary of the AppStacks components on $($AppVolServer.split('.')[0])."
@@ -38,7 +41,11 @@ function Get-AbrAPPVolAppstack {
                         foreach ($AppStack in $AppStacks.data) {
                             try {
                                 $AppStackID = $AppStack.id
-                                $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
+
+                                if ($PSVersionTable.PSEdition -eq 'Core') {
+                                    $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
+                                } else {$AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"}
+
                                 $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
 
                                 $inObj = [ordered] @{
@@ -72,7 +79,11 @@ function Get-AbrAPPVolAppstack {
                                 foreach ($AppStack in $AppStacks.data | Sort-Object -Property Name) {
                                     try {
                                         $AppStackID = $appstack.id
-                                        $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
+
+                                        if ($PSVersionTable.PSEdition -eq 'Core') {
+                                            $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
+                                        } else {$AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"}
+
                                         $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
                                         if ($AppStackPackage) {
                                             section -Style Heading5 "$($AppStack.Name)" {
@@ -115,10 +126,13 @@ function Get-AbrAPPVolAppstack {
                                                                 $inObj = [ordered] @{
                                                                     'Name' = $Package.Name
                                                                     'Version' = $Package.Version
-                                                                    'Created' = $Package.created_at.Split()[0]
+                                                                    'Created' = Switch ($Package.created_at) {
+                                                                        $Null {'--'}
+                                                                        default {([DateTime]$Package.created_at).ToShortDateString()}
+                                                                    }
                                                                     'Mounted' = Switch ($Package.mounted_at) {
                                                                         $Null {'--'}
-                                                                        default {$Package.mounted_at.ToString('yyyy-mm-dd')}
+                                                                        default {([DateTime]$Package.mounted_at).ToShortDateString()}
                                                                     }
                                                                     'Size' = $Package.size_human
                                                                     'Current' = Switch ($Package.app_markers.name) {
@@ -141,7 +155,11 @@ function Get-AbrAPPVolAppstack {
                                                             $OutObj | Sort-Object -Property 'Version' -Descending | Table @TableParams
                                                             try {
                                                                 $AppStackPackage =  ($AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}).id
-                                                                $AppStackPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"
+
+                                                                if ($PSVersionTable.PSEdition -eq 'Core') {
+                                                                    $AppStackPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"
+                                                                } else {$AppStackPrograms = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"}
+
                                                                 if ($AppStackPrograms) {
                                                                     section -ExcludeFromTOC -Style NOTOCHeading6 "Programs" {
                                                                         $OutObj = @()
@@ -175,7 +193,11 @@ function Get-AbrAPPVolAppstack {
                                                 }
                                                 try {
                                                     $AppStackID = $appstack.id
-                                                    $AppStackAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"
+
+                                                    if ($PSVersionTable.PSEdition -eq 'Core') {
+                                                        $AppStackAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"
+                                                    } else {$AppStackAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"}
+
                                                     if ($AppStackAssignments) {
                                                         section -ExcludeFromTOC -Style NOTOCHeading6 "Assignment" {
                                                             $OutObj = @()

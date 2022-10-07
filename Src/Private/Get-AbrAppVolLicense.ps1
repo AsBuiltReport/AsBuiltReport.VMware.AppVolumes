@@ -29,7 +29,10 @@ function Get-AbrAPPVolLicense {
     process {
         if ($InfoLevel.AppVolumes.License -ge 1) {
             try {
-                $License = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $License = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license"
+                } else {$License = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license"}
+
                 if ($License) {
                     $OutObj = @()
                     section -Style Heading3 "License Information" {

@@ -29,7 +29,10 @@ function Get-AbrAPPVolManager {
     process {
         if ($InfoLevel.AppVolumes.Managers -ge 1) {
             try {
-                $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
+                } else {$Managers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"}
+
                 if ($Managers) {
                     $OutObj = @()
                     section -Style Heading3 "Manager Servers" {

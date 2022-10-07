@@ -29,7 +29,9 @@ function Get-AbrAppVolADDomain {
     process {
         if ($InfoLevel.AppVolumes.ADDomains -ge 1) {
             try {
-                $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
+                } else {$LDAPDomains = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"}
                 if ($LDAPDomains) {
                     section -Style Heading3 "Active Directory Domain" {
                         $OutObj = @()

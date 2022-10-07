@@ -29,7 +29,10 @@ function Get-AbrAppVolStorage {
     process {
         if ($InfoLevel.AppVolumes.StorageLocations -ge 1) {
             try {
-                $Storages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $Storages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
+                } else {$Storages = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"}
+
                 if ($Storages) {
                     section -Style Heading3 "Storages" {
                         Paragraph "The following section details configured storage options for Packages, Writable Volumes, and AppStacks on $($AppVolServer.split('.')[0])."
@@ -63,7 +66,10 @@ function Get-AbrAppVolStorage {
                         }
                         $OutObj | Sort-Object -Property Name |  Table @TableParams
                         if ($InfoLevel.AppVolumes.StorageLocations -ge 2) {
-                            $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
+                            if ($PSVersionTable.PSEdition -eq 'Core') {
+                                $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
+                            } else {$Datastores = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"}
+
                             if ($Datastores) {
                                 section -Style Heading4 "Storage Details" {
                                     Paragraph "The following section details Datastores seen by the manager $($AppVolServer.split('.')[0])."

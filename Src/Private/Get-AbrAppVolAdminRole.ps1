@@ -29,7 +29,10 @@ function Get-AbrAppVolAdminRole {
     process {
         if ($InfoLevel.AppVolumes.AdminGroups -ge 1) {
             try {
-                $AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
+                } else {$AdminGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"}
+
                 if ($AdminGroups) {
                     section -Style Heading3 "Administrator Roles" {
                         $OutObj = @()

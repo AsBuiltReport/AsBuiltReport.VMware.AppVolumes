@@ -29,7 +29,16 @@ function Get-AbrAppVolSetting {
     process {
         if ($InfoLevel.AppVolumes.Settings -ge 1) {
             try {
-                $Settings = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $Settings = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
+                    $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
+
+                } else {
+                    $Settings = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
+                    $Datastores = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
+                }
+
+
                 if ($Settings) {
                     section -Style Heading3 "Settings" {
                         $OutObj = @()

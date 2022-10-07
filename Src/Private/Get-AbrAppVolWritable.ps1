@@ -29,7 +29,10 @@ function Get-AbrAppVolWritable {
     process {
         if ($InfoLevel.AppVolumes.Writables -ge 1) {
             try {
-                $Writables = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/writables"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $Writables = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/writables"
+                } else {$Writables = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/writables"}
+
                 if ($Writables) {
                     section -Style Heading3 "Writable AppStack" {
                         Paragraph "The following section provide a summary of Writable AppStack components on $($AppVolServer.split('.')[0])."

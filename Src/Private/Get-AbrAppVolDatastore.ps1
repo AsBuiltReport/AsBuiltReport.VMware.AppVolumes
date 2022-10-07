@@ -29,7 +29,10 @@ function Get-AbrAppVolDatastore {
     process {
         if ($InfoLevel.AppVolumes.Storage -ge 1) {
             try {
-                $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
+                } else {$Datastores = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"}
+
                 if ($Datastores) {
                     section -Style Heading3 "Storage Overview" {
                         foreach ($DatastoreD in $Datastores.datastores) {
