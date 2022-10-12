@@ -25,17 +25,20 @@
         [String] $StylePath
     )
 
-    # Check if the required version of VMware PowerCLI is installed
-    #Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.7'
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
+    Write-PScriboMessage -IsWarning "Please refer to the AsBuiltReport.VMware.AppVolumes github website for more detailed information about this project."
+    Write-PScriboMessage -IsWarning "Do not forget to update your report configuration file after each new version release."
+    Write-PScriboMessage -IsWarning "Documentation: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes"
+    Write-PScriboMessage -IsWarning "Issues or bug reporting: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/issues"
+
+    # Check if the required version of VMware PowerCLI is installed
+    Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.7'
 
     # Import JSON Configuration for Options and InfoLevel
     $Report = $ReportConfig.Report
     $InfoLevel = $ReportConfig.InfoLevel
     $Options = $ReportConfig.Options
-
-    # If custom style not set, use default style
-
 
     $RESTAPIUser = $Credential.UserName
     $RESTAPIPassword = $Credential.GetNetworkCredential().password
@@ -48,59 +51,45 @@
     foreach ($AppVolServer in $Target) {
 
         Try {
-            $AppVolServerRest = Invoke-RestMethod -SkipCertificateCheck -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds
+            if ($PSVersionTable.PSEdition -eq 'Core') {
+                $AppVolServerRest = Invoke-RestMethod -SkipCertificateCheck -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds
+            } else {$AppVolServerRest = Invoke-RestMethod -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds}
         } Catch {
             Write-Error $_
         }
 
         # Generate report if connection to AppVolumes Server Connection is successful
         if ($AppVolServerRest.success -eq 'Ok') {
-
-            #Environment Varibles
-
-            #Applications
-            #$Applications = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/applications"
-
-            #Directory Users
-            #$ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
-
-            #Directory Groups
-            #$ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
-
-            #Storage Locations
-            #$Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
-
-            #Storage Groups
-            #$StorageGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storage_groups"
-
-            #AD Domains
-            #$LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
-
-            #Admin Roles
-            #$AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
-
-            #Machine Managers
-            #$MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
-
-            #Storage
-            #$Storages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"
-
-            #Settings
-            #$Settings = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/settings"
-
-        }
-
-
-        # Generate report if connection to AppVolumes Manager General Information is successful
-        if ($InfoLevel.AppVolumes.General -ge 1) {
-            section -Style Heading1 $($AppVolServer) {
-                Get-AbrAPPVolGeneral
-                Get-AbrAPPVolManager
-                Get-AbrAPPVolLicense
-                Get-AbrAPPVolAppstack
-                Get-AbrAppVolWritable
-                Get-AbrAppVolADUser
-                Get-AbrAppVolADGroup
+            # Generate report if connection to AppVolumes Manager General Information is successful
+            if ($InfoLevel.AppVolumes.General -ge 1) {
+                section -Style Heading1 $($AppVolServer) {
+                    Paragraph "The following section provides a summary of the implemented components on the VMware App Volumes infrastructure."
+                    Get-AbrAPPVolGeneral
+                    section -Style Heading2 "Inventory" {
+                        Get-AbrAppVolAppstack
+                        Get-AbrAppVolWritable
+                    }
+                    section -Style Heading2 "Directory" {
+                        Get-AbrAppVolADUser
+                        Get-AbrAppVolADGroup
+                        Get-AbrAppVolADOU
+                    }
+                    section -Style Heading2 "Infrastructure" {
+                        Get-AbrAppVolStorage
+                        Get-AbrAppVolStorageGroup
+                    }
+                    section -Style Heading2 "Configuration" {
+                        Paragraph "The following section details configuration settings for App Volumes Manager $($AppVolServer.split('.')[0])."
+                        Blankline
+                        Get-AbrAppVolLicense
+                        Get-AbrAppVolADDomain
+                        Get-AbrAppVolAdminRole
+                        Get-AbrAppVolMachineManager
+                        Get-AbrAppVolDatastore
+                        Get-AbrAPPVolManager
+                        Get-AbrAppVolSetting
+                    }
+                }
             }
         }
     }

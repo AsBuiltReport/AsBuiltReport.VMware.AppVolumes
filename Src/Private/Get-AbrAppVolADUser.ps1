@@ -29,9 +29,14 @@ function Get-AbrAppVolADUser {
     process {
         if ($InfoLevel.AppVolumes.ADUsers -ge 1) {
             try {
-                $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
+                } else {$ActiveDirectoryUsers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"}
+
                 if ($ActiveDirectoryUsers) {
-                    section -Style Heading2 "Managed Users" {
+                    section -Style Heading3 "Managed Users" {
+                        Paragraph "The following section provide a summary of Users who have logged-in to a managed computer or have assignments on $($AppVolServer.split('.')[0])."
+                        Blankline
                         $OutObj = @()
                         foreach ($ActiveDirectoryUser in $ActiveDirectoryUsers) {
                             try {
@@ -59,7 +64,7 @@ function Get-AbrAppVolADUser {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj | Table @TableParams
+                        $OutObj| Sort-Object -Property upn | Table @TableParams
                     }
                 }
             }

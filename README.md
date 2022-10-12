@@ -27,14 +27,19 @@
 
 # VMware AppVolumes As Built Report
 
-<!-- ********** REMOVE THIS MESSAGE WHEN THE MODULE IS FUNCTIONAL ********** -->
-## :exclamation: THIS ASBUILTREPORT MODULE IS CURRENTLY IN DEVELOPMENT AND MIGHT NOT YET BE FUNCTIONAL ❗
-
 VMware AppVolumes As Built Report is a PowerShell module which works in conjunction with [AsBuiltReport.Core](https://github.com/AsBuiltReport/AsBuiltReport.Core).
 
 [AsBuiltReport](https://github.com/AsBuiltReport/AsBuiltReport) is an open-sourced community project which utilises PowerShell to produce as-built documentation in multiple document formats for multiple vendors and technologies.
 
 Please refer to the AsBuiltReport [website](https://www.asbuiltreport.com) for more detailed information about this project.
+
+# :books: Sample Reports
+
+## Sample Report - Custom Style
+
+Sample VMware AppVolumes As Built report HTML file: [Sample VMware AppVolumes As Built Report.html](https://htmlpreview.github.io/?https://raw.githubusercontent.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/dev/Samples/Sample%20VMware%20AppVolumes%20As%20Built%20Report.html)
+
+Sample VMware AppVolumes As Built report PDF file: [Sample VMware AppVolumes As Built Report.pdf](https://raw.githubusercontent.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/dev/Samples/Sample%20VMware%20AppVolumes%20As%20Built%20Report.pdf)
 
 # :beginner: Getting Started
 Below are the instructions on how to install, configure and generate a VMware AppVolumes As Built report.
@@ -43,7 +48,7 @@ Below are the instructions on how to install, configure and generate a VMware Ap
 <!-- ********** Update supported AppVolumes versions ********** -->
 The VMware AppVolumes As Built Report supports the following AppVolumes versions;
 
-- Should work on versions 2.x. Has been tested on 2.14 through 2.18.4 and Version 4.0.0 and 4.0.1
+- Should work on version 4.+
 
 ### PowerShell
 This report is compatible with the following PowerShell versions;
@@ -56,6 +61,7 @@ This report is compatible with the following PowerShell versions;
 <!-- ********** Update system requirements ********** -->
 PowerShell 5.1 or PowerShell 7, and the following PowerShell modules are required for generating a VMware AppVolumes As Built Report.
 
+- [VMware PowerCLI Module](https://www.powershellgallery.com/packages/VMware.PowerCLI/)
 - [AsBuiltReport.VMware.AppVolumes Module](https://www.powershellgallery.com/packages/AsBuiltReport.VMware.AppVolumes/)
 
 ### Linux & macOS
@@ -142,20 +148,22 @@ General | 1 | 1 |
 Managers | 1 | 1 |
 License | 1 | 1 |
 AppStacks | 1 | 2 |
-ADUsers | 1 | 2 |
-ADGroups | 1 | 2 |
+ADUsers | 1 | 1 |
+ADGroups | 1 | 1 |
+ADOUs | 1 | 1 |
 Writeables | 1 | 2 |
-Applications | 1 | 2 |
 StorageLocations | 1 | 2 |
-StorageGroups | 1 | 2 |
-ADDomains | 1 | 2 |
-AdminGroups | 1 | 2 |
-MachineManagers | 1 | 2 |
-Storage | 1 | 2 |
+StorageGroups | 1 | 1 |
+ADDomains | 1 | 1 |
+AdminGroups | 1 | 1 |
+MachineManagers | 1 | 1 |
+Storage | 1 | 1 |
 Settings | 1 | 1 |
 
 ### Healthcheck
 The **Healthcheck** schema is used to toggle health checks on or off.
+
+Health checks are yet to be developed.
 
 ## :computer: Examples
 

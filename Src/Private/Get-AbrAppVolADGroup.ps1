@@ -29,14 +29,18 @@ function Get-AbrAppVolADGroup {
     process {
         if ($InfoLevel.AppVolumes.ADGroups -ge 1) {
             try {
-                $ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
+                } else {$ActiveDirectoryGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"}
                 if ($ActiveDirectoryGroups) {
-                    section -Style Heading2 "Managed Groups" {
+                    section -Style Heading3 "Managed Groups" {
+                        Paragraph "The following section provide a summary of Groups that have assignments on $($AppVolServer.split('.')[0])."
+                        BlankLine
                         $OutObj = @()
                         foreach ($ActiveDirectoryGroup in $ActiveDirectoryGroups.groups) {
                             try {
                                 $inObj = [ordered] @{
-                                    'Name' = $ActiveDirectoryGroup.upn
+                                    'Name' = $ActiveDirectoryGroup.Name
                                     'Last Logon' = $ActiveDirectoryGroup.last_login_human.split()[0,1,2] -join ' '
                                     'Status' = $ActiveDirectoryGroup.status
                                     'Writable' = $ActiveDirectoryGroup.writables
@@ -53,12 +57,12 @@ function Get-AbrAppVolADGroup {
                         $TableParams = @{
                             Name = "Managed Groups - $($AppVolServer)"
                             List = $false
-                            ColumnWidths =20, 16, 16, 16, 16, 16
+                            ColumnWidths = 30, 16, 16, 12, 12, 14
                         }
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj | Table @TableParams
+                        $OutObj | Sort-Object -Property Name | Table @TableParams
                     }
                 }
             }

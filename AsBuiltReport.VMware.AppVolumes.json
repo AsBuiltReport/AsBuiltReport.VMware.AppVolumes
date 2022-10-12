@@ -20,6 +20,7 @@
             "AppStacks": 1,
             "ADUsers": 1,
             "ADGroups": 1,
+            "ADOus": 1,
             "Writables": 1,
             "Applications": 1,
             "StorageLocations": 1,
@@ -29,6 +30,6 @@
             "MachineManagers": 1,
             "Storage": 1,
             "Settings": 1
-        } 
+        }
     }
 }
