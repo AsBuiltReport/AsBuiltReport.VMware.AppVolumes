@@ -5,7 +5,7 @@
     .DESCRIPTION
         Documents the configuration of VMware AppVolumes in Word/HTML/XML/Text formats using PScribo.
     .NOTES
-        Version:        0.1.1
+        Version:        0.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
