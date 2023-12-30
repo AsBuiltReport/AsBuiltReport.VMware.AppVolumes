@@ -5,7 +5,7 @@ function Get-AbrAppVolSetting {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -41,6 +41,9 @@ function Get-AbrAppVolSetting {
 
                 if ($Settings) {
                     section -Style Heading3 "Settings" {
+                        Paragraph "The following section details app volumes settings for $($AppVolServer.split('.')[0])."
+                        BlankLine
+
                         $OutObj = @()
                         try {
                             foreach($Setting in $Settings.data.setting){
@@ -96,13 +99,16 @@ function Get-AbrAppVolSetting {
                                 if($Setting.key -eq "disable_agent_session_cookie"){
                                     $DisableAgentSessionCookie = $Setting.value
                                 }
+                                if($Setting.key -eq "ENABLE_PARTIAL_RECONFIG"){
+                                    $VMDKPackageResiliency = $Setting.value
+                                }
                             }
 
                             $inObj = [ordered] @{
                                 'UI Session Timeout' = $UISessionTimeout
                                 'Non-Domain Entities' = $NonDomainEntities
                                 'Writeable Volumes Regular Backups' = $RegularBackups
-                                'Writeable Volumes Regular Backups Interval' = "$($RegularBackupsInterval) days"
+                                'Writeable Volumes Regular Backups Interval' = "$($RegularBackupsInterval) - days"
                                 'Writeable Volumes Storage Location' = $DatastoreBackupName
                                 'Writeable Volumes Storage Path' = $StoragePath
                                 'Disable Agent Session Cookie' = $DisableAgentSessionCookie
@@ -110,6 +116,7 @@ function Get-AbrAppVolSetting {
                                 'Disable Token AD Query' = $DisableTokenADQuery
                                 'Enable Volumes (2.x)' = $Disable2XVolumes
                                 'Allow package delivery to any operating system' = $DisableDELIVERYTOANYOS
+                                'VMDK Package Resiliency' = $VMDKPackageResiliency
                                 'Join the VMware CEIP' = $DisableJOINCEIP
                             }
                             $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)

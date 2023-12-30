@@ -5,7 +5,7 @@
     .DESCRIPTION
         Documents the configuration of VMware AppVolumes in Word/HTML/XML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -66,21 +66,30 @@
                     Paragraph "The following section provides a summary of the implemented components on the VMware App Volumes infrastructure."
                     Get-AbrAPPVolGeneral
                     section -Style Heading2 "Inventory" {
-                        Get-AbrAppVolAppstack
+                        Get-AbrAPPVolApplication
+                        Get-AbrAppVolPackage
+                        Get-AbrAppVolProgram
+                        Get-AbrAppVolAssignment
                         Get-AbrAppVolWritable
+                        #Get-AbrAppVolAppstack
                     }
                     section -Style Heading2 "Directory" {
                         Get-AbrAppVolADUser
+                        Get-AbrAppVolComputer
                         Get-AbrAppVolADGroup
                         Get-AbrAppVolADOU
                     }
                     section -Style Heading2 "Infrastructure" {
+                        Get-AbrAppVolMachine
                         Get-AbrAppVolStorage
                         Get-AbrAppVolStorageGroup
+                        Get-AbrAppVolInstance
+                    }
+                    section -Style Heading2 "Activity" {
+                        Get-AbrAppVolJob
+                        Get-AbrAppVolTSArchive
                     }
                     section -Style Heading2 "Configuration" {
-                        Paragraph "The following section details configuration settings for App Volumes Manager $($AppVolServer.split('.')[0])."
-                        Blankline
                         Get-AbrAppVolLicense
                         Get-AbrAppVolADDomain
                         Get-AbrAppVolAdminRole

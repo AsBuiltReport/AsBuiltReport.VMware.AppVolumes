@@ -5,7 +5,7 @@ function Get-AbrAppVolDatastore {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -35,6 +35,8 @@ function Get-AbrAppVolDatastore {
 
                 if ($Datastores) {
                     section -Style Heading3 "Storage Overview" {
+                        Paragraph "The following section details off location of templates for $($AppVolServer.split('.')[0])."
+                        BlankLine
                         foreach ($DatastoreD in $Datastores.datastores) {
                             try {
                                 if($DatastoreD.uniq_string -eq $Datastores.data_disk_storage){
@@ -52,7 +54,7 @@ function Get-AbrAppVolDatastore {
                             }
                         }
                         try {
-                            section -Style Heading4 "Packages" {
+                            section -Style Heading4 "Storage Overview Packages" {
                                 $OutObj = @()
                                 $inObj = [ordered] @{
                                     'Default Storage Location' = "[$($Datastores.Datacenter)] $DatastoreAppStorage"
@@ -76,7 +78,7 @@ function Get-AbrAppVolDatastore {
                             Write-PscriboMessage -IsWarning $_.Exception.Message
                         }
                         try {
-                            section -Style Heading4 "Writable Volumes" {
+                            section -Style Heading4 "Storage Overview Writable Volumes" {
                                 $OutObj = @()
                                 $inObj = [ordered] @{
                                     'Default Storage Location' = "[$($Datastores.Datacenter)] $DatastoreWritableStorage"

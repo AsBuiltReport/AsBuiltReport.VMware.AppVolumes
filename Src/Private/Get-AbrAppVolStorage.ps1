@@ -5,7 +5,7 @@ function Get-AbrAppVolStorage {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -22,8 +22,8 @@ function Get-AbrAppVolStorage {
     )
 
     begin {
-        Write-PScriboMessage "StorageLocations InfoLevel set at $($InfoLevel.AppVolumes.StorageLocations)."
-        Write-PscriboMessage "Collecting Active Directory Domain information."
+        Write-PScriboMessage "Storage Locations InfoLevel set at $($InfoLevel.AppVolumes.StorageLocations)."
+        Write-PscriboMessage "Collecting storage location information."
     }
 
     process {
@@ -34,7 +34,7 @@ function Get-AbrAppVolStorage {
                 } else {$Storages = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/storages"}
 
                 if ($Storages) {
-                    section -Style Heading3 "Storages" {
+                    section -Style Heading3 "Managed Storage Locations" {
                         Paragraph "The following section details configured storage options for Packages, Writable Volumes, and AppStacks on $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
@@ -59,7 +59,7 @@ function Get-AbrAppVolStorage {
                         $TableParams = @{
                             Name = "Storages - $($AppVolServer)"
                             List = $false
-                            ColumnWidths = 28, 24, 12, 12, 12, 12
+                            ColumnWidths = 30, 14, 14, 14, 14, 14
                         }
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
@@ -71,21 +71,19 @@ function Get-AbrAppVolStorage {
                             } else {$Datastores = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"}
 
                             if ($Datastores) {
-                                section -Style Heading4 "Storage Details" {
-                                    Paragraph "The following section details Datastores seen by the manager $($AppVolServer.split('.')[0])."
-                                    BlankLine
+                                #section -Style Heading4 "Storage Details" {
                                     $OutObj = @()
                                     foreach ($Datastore in $Datastores.datastores | Sort-Object -Property Name) {
-                                        section -ExcludeFromTOC -Style NOTOCHeading5 "$($DataStore.name)" {
+                                        section -ExcludeFromTOC -Style NOTOCHeading5 "Storage Details - $($DataStore.name)" {
                                             try {
                                                 $inObj = [ordered] @{
                                                     'Display Name' = $DataStore.display_Name
+                                                    'Machine Manager' = $DataStore.Host
                                                     'Category' = $DataStore.Catagory
                                                     'Datacenter ' = $DataStore.datacenter
                                                     'Notes' = $DataStore.note
                                                     'Description' = $DataStore.description
                                                     'Accessible' = $DataStore.accessible
-                                                    'Host' = $DataStore.host
                                                     'Template Storage' = $DataStore.template_storage
                                                     'Host Username' = $DataStore.host_username
                                                     'Free Space' = ConvertTo-FileSizeString $DataStore.free_space
@@ -109,7 +107,7 @@ function Get-AbrAppVolStorage {
                                             }
                                         }
                                     }
-                                }
+                                #}
                             }
                         }
                     }

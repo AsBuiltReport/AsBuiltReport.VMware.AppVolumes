@@ -1,7 +1,7 @@
-function Get-AbrAPPVolAppstack {
+function Get-AbrAPPVolApplication {
     <#
     .SYNOPSIS
-        Used by As Built Report to retrieve VMware APPVolume Appstack information.
+        Used by As Built Report to retrieve VMware APPVolume Product information.
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
@@ -22,39 +22,39 @@ function Get-AbrAPPVolAppstack {
     )
 
     begin {
-        Write-PScriboMessage "AppStacks InfoLevel set at $($InfoLevel.AppVolumes.AppStacks)."
-        Write-PscriboMessage "Collecting AppStacks information."
+        Write-PScriboMessage "Products InfoLevel set at $($InfoLevel.AppVolumes.Products)."
+        Write-PscriboMessage "Collecting Products information."
     }
 
     process {
-        if ($InfoLevel.AppVolumes.AppStacks -ge 1) {
+        if ($InfoLevel.AppVolumes.Products -ge 1) {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
-                    $AppStacks = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products"
-                } else {$AppStacks = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products"}
+                    $Products = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products"
+                } else {$Products = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products"}
 
-                if ($AppStacks) {
-                    section -Style Heading3 'AppStacks Summary' {
-                        Paragraph "The following section provide a summary of the AppStacks components on $($AppVolServer.split('.')[0])."
+                if ($Products) {
+                    section -Style Heading3 'Application Summary' {
+                        Paragraph "The following section provide a summary of the applications captured on $($AppVolServer.split('.')[0])."
                         Blankline
                         $OutObj = @()
-                        foreach ($AppStack in $AppStacks.data) {
+                        foreach ($Product in $Products.data) {
                             try {
-                                $AppStackID = $AppStack.id
+                                $ProductID = $Product.id
 
                                 if ($PSVersionTable.PSEdition -eq 'Core') {
-                                    $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
-                                } else {$AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"}
+                                    $ProductIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"
+                                } else {$ProductIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"}
 
-                                $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
+                                $ProductPackage =  $ProductIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
 
                                 $inObj = [ordered] @{
-                                    'Name' = $AppStack.Name
-                                    'Status' = $AppStack.Status
-                                    'Created' = $AppStack.created_At_Human
-                                    'Template Version' = $AppStackPackage.template_version
-                                    'Agent Version' = $AppStackPackage.agent_version
-                                    'Applications Count' = $AppStackPackage.programs_count
+                                    'Name' = $Product.Name
+                                    'Status' = $Product.Status
+                                    'Created' = $Product.created_At_Human
+                                    'Template Version' = $ProductPackage.template_version
+                                    'Agent Version' = $ProductPackage.agent_version
+                                    'Applications Count' = $ProductPackage.programs_count
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
 
@@ -64,7 +64,7 @@ function Get-AbrAPPVolAppstack {
                             }
                         }
                         $TableParams = @{
-                            Name = "AppStacks - $($AppVolServer)"
+                            Name = "Application Summary - $($AppVolServer)"
                             List = $false
                             ColumnWidths = 25, 15, 15, 15, 15, 15
                         }
@@ -72,44 +72,37 @@ function Get-AbrAPPVolAppstack {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
                         $OutObj | Sort-Object -Property Name | Table @TableParams
-                        if ($InfoLevel.AppVolumes.AppStacks -ge 2) {
-                            section -Style Heading4 "AppStacks Details" {
-                                Paragraph "The following section details AppStacks configuration information on $($AppVolServer.split('.')[0])."
-                                Blankline
-                                foreach ($AppStack in $AppStacks.data | Sort-Object -Property Name) {
+                        if ($InfoLevel.AppVolumes.Products -ge 2) {
+                            section -Style Heading4 "Applications Details" {
+                                foreach ($Product in $Products.data | Sort-Object -Property Name) {
                                     try {
-                                        $AppStackID = $appstack.id
+                                        $ProductID = $Product.id
 
                                         if ($PSVersionTable.PSEdition -eq 'Core') {
-                                            $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
-                                        } else {$AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"}
+                                            $ProductIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"
+                                        } else {$ProductIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"}
 
-                                        $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
-                                        if ($AppStackPackage) {
-                                            section -Style Heading5 "$($AppStack.Name)" {
+                                        $ProductPackage =  $ProductIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
+                                        if ($Product) {
+                                            section -Style Heading5 "Application Details - $($Product.Name)" {
                                                 $OutObj = @()
                                                 $inObj = [ordered] @{
-                                                    'Name' = $AppStack.Name
-                                                    'Path' = $AppStackPackage.Path
-                                                    'Datastore Name' = $AppStackPackage.datastore_Name
-                                                    'Status' = $AppStackPackage.Status
-                                                    'Created' = $AppStackPackage.created_At_Human
-                                                    'Mounted' = $AppStackPackage.mounted_at
-                                                    'Size' = $AppStackPackage.size_human
-                                                    'Total Assignments' = $AppStackPackage.assignment_count
-                                                    'Attachments Total' = $AppStackPackage.attachment_count
-                                                    'Attachment Limit' = $AppStackPackage.attachment_limit
-                                                    'Description' = $AppStackPackage.description
-                                                    'Applications Count' = $AppStackPackage.programs_count
-                                                    'Agent Version' = $AppStackPackage.agent_version
-                                                    'Package Agent Version' = $AppStackPackage.capture_version
-                                                    'OS Version' = $AppStackPackage.primordial_os_name
-                                                    'Provisioning Duration' = $AppStackPackage.provision_duration
+                                                    'Name' = $Product.Name
+                                                    'Status' = $Product.Status
+                                                    'Owner' = $Product.Owner_Guid
+                                                    'Total Assignments' = $Product.assignment_count
+                                                    'Created' = $Product.created_At_Human
+                                                    'Modified' = $Product.updated_at_human
+                                                    'Description' = $Product.description
+                                                    'RDS Package Attachment' = $Product.allow_multiple_package_attachment
+                                                    'Last Synchronized' = $Product.synced_at_human
+                                                    'Sync Status' = $Product.sync_status
+
                                                 }
                                                 $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 
                                                 $TableParams = @{
-                                                    Name = "AppStack Details - $($AppStack.Name)"
+                                                    Name = "Application Details - $($Product.Name)"
                                                     List = $true
                                                     ColumnWidths = 50, 50
                                                 }
@@ -118,11 +111,11 @@ function Get-AbrAPPVolAppstack {
                                                 }
                                                 $OutObj | Table @TableParams
                                                 try {
-                                                    $AppStackPackages =  $AppStackIDSource.data
-                                                    if ($AppStackPackage) {
-                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Packages" {
+                                                    $ProductPackages =  $ProductIDSource.data
+                                                    if ($ProductPackage) {
+                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Application Packages" {
                                                             $OutObj = @()
-                                                            foreach ($Package in $AppStackPackages) {
+                                                            foreach ($Package in $ProductPackages) {
                                                                 $inObj = [ordered] @{
                                                                     'Name' = $Package.Name
                                                                     'Version' = $Package.Version
@@ -145,7 +138,7 @@ function Get-AbrAPPVolAppstack {
                                                             }
 
                                                             $TableParams = @{
-                                                                Name = "Packages - $($AppStack.Name)"
+                                                                Name = "Application Packages - $($Product.Name)"
                                                                 List = $false
                                                                 ColumnWidths = 25, 15, 15, 15, 15, 15
                                                             }
@@ -154,16 +147,16 @@ function Get-AbrAPPVolAppstack {
                                                             }
                                                             $OutObj | Sort-Object -Property 'Version' -Descending | Table @TableParams
                                                             try {
-                                                                $AppStackPackage =  ($AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}).id
+                                                                $ProductPackage =  ($ProductIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}).id
 
                                                                 if ($PSVersionTable.PSEdition -eq 'Core') {
-                                                                    $AppStackPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"
-                                                                } else {$AppStackPrograms = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"}
+                                                                    $ProductPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_packages/$ProductPackage/programs"
+                                                                } else {$ProductPrograms = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_packages/$ProductPackage/programs"}
 
-                                                                if ($AppStackPrograms) {
-                                                                    section -ExcludeFromTOC -Style NOTOCHeading6 "Programs" {
+                                                                if ($ProductPrograms) {
+                                                                    section -ExcludeFromTOC -Style NOTOCHeading6 "Application Programs" {
                                                                         $OutObj = @()
-                                                                        foreach ($Program in $AppStackPrograms.data) {
+                                                                        foreach ($Program in $ProductPrograms.data) {
                                                                             $inObj = [ordered] @{
                                                                                 'Name' = $Program.Name
                                                                                 'Version' = $Program.Version
@@ -173,7 +166,7 @@ function Get-AbrAPPVolAppstack {
                                                                         }
 
                                                                         $TableParams = @{
-                                                                            Name = "Programs - $($AppStack.Name)"
+                                                                            Name = "Application Programs - $($Product.Name)"
                                                                             List = $false
                                                                             ColumnWidths = 50, 30, 20
                                                                         }
@@ -192,20 +185,20 @@ function Get-AbrAPPVolAppstack {
                                                     Write-PscriboMessage -IsWarning $_.Exception.Message
                                                 }
                                                 try {
-                                                    $AppStackID = $appstack.id
+                                                    $ProductID = $Product.id
 
                                                     if ($PSVersionTable.PSEdition -eq 'Core') {
-                                                        $AppStackAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"
-                                                    } else {$AppStackAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"}
+                                                        $ProductAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/assignments?include=entities"
+                                                    } else {$ProductAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/assignments?include=entities"}
 
-                                                    if ($AppStackAssignments) {
-                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Assignment" {
+                                                    if ($ProductAssignments) {
+                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Application Assignment" {
                                                             $OutObj = @()
-                                                            foreach ($AppStackAssignment in $AppStackAssignments.data) {
+                                                            foreach ($ProductAssignment in $ProductAssignments.data) {
                                                                 try {
                                                                     $inObj = [ordered] @{
-                                                                        'Name' = $AppStackAssignment.entities.upn
-                                                                        'Type' = $AppStackAssignment.entities.entity_type
+                                                                        'Name' = $ProductAssignment.entities.upn
+                                                                        'Type' = $ProductAssignment.entities.entity_type
                                                                     }
                                                                     $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                                                                 }
@@ -215,7 +208,7 @@ function Get-AbrAPPVolAppstack {
                                                             }
 
                                                             $TableParams = @{
-                                                                Name = "Assignment - $($AppStack.Name)"
+                                                                Name = "Application Assignment - $($Product.Name)"
                                                                 List = $false
                                                                 ColumnWidths = 50, 50
                                                             }

@@ -15,21 +15,30 @@
         "_comment_": "0 = Disabled, 1 = Summary, 2 = Detailed, 3 = Adv Detailed",
         "AppVolumes": {
             "General": 1,
-            "Managers": 1,
-            "License": 1,
-            "AppStacks": 1,
+            "Applications":1,
+            "Packages": 1,
+            "Programs": 1,
+            "Assignments": 1,
+            "Writables": 1,
             "ADUsers": 1,
+            "Computers": 1,
             "ADGroups": 1,
             "ADOus": 1,
-            "Writables": 1,
-            "Applications": 1,
+            "Machines": 1,
             "StorageLocations": 1,
             "StorageGroups": 1,
+            "Instances": 1,
+            "Jobs": 1,
+            "Troubleshooting": 1,
+            "License": 1,
             "ADDomains": 1,
             "AdminGroups": 1,
             "MachineManagers": 1,
             "Storage": 1,
-            "Settings": 1
+            "Settings": 1,
+            "Managers": 1,
+            "Products": 1
+
         }
     }
 }

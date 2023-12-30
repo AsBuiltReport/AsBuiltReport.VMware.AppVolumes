@@ -5,7 +5,7 @@ function Get-AbrAppVolAdminRole {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -35,6 +35,9 @@ function Get-AbrAppVolAdminRole {
 
                 if ($AdminGroups) {
                     section -Style Heading3 "Administrator Roles" {
+                        Paragraph "The following section details administrative rolls for $($AppVolServer.split('.')[0])."
+                        BlankLine
+
                         $OutObj = @()
                         foreach ($AdminGroup in $AdminGroups.group_permissions) {
                             try {

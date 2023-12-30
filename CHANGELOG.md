@@ -1,5 +1,13 @@
 # :arrows_clockwise: VMware AppVolumes As Built Report Changelog
 
+## [1.1.0] - 2023-12-30
+
+### Added
+
+- Updated Report to work with App Volumes 2309
+- Added Instances functions and many others
+- Improved functionaliy and layout.
+
 ## [0.2.0] - 2022-10-12
 
 ### Added

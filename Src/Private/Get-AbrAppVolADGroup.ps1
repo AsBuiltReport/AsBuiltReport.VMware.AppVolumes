@@ -5,7 +5,7 @@ function Get-AbrAppVolADGroup {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -40,12 +40,11 @@ function Get-AbrAppVolADGroup {
                         foreach ($ActiveDirectoryGroup in $ActiveDirectoryGroups.groups) {
                             try {
                                 $inObj = [ordered] @{
-                                    'Name' = $ActiveDirectoryGroup.Name
+                                    'Group Name' = $ActiveDirectoryGroup.Name
+                                    'Writable' = $ActiveDirectoryGroup.writables
+                                    'Assignments' = $ActiveDirectoryGroup.application_assignment_count
                                     'Last Logon' = $ActiveDirectoryGroup.last_login_human.split()[0,1,2] -join ' '
                                     'Status' = $ActiveDirectoryGroup.status
-                                    'Writable' = $ActiveDirectoryGroup.writables
-                                    'AppStack' = $ActiveDirectoryGroup.appstacks
-                                    'Assignments' = $ActiveDirectoryGroup.application_assignment_count
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                             }
@@ -57,7 +56,7 @@ function Get-AbrAppVolADGroup {
                         $TableParams = @{
                             Name = "Managed Groups - $($AppVolServer)"
                             List = $false
-                            ColumnWidths = 30, 16, 16, 12, 12, 14
+                            ColumnWidths = 30, 15, 15, 25, 15
                         }
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
