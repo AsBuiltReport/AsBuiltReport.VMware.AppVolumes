@@ -117,7 +117,8 @@ function Get-AbrAppVolPackage {
                                                 try {
                                                     if ($PSVersionTable.PSEdition -eq 'Core') {
                                                         $Programs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/programs"
-                                                    } else {$Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/programs"}                                                    Write-PscriboMessage "Working on Programs for $($AppPackage.Name)."
+                                                    } else {$Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/programs"}
+                                                    Write-PscriboMessage "Working on Programs for $($AppPackage.Name)."
                                                     if ($Programs) {
                                                         section -ExcludeFromTOC -Style NOTOCHeading6 "Programs" {
                                                             $OutObj = @()
@@ -157,8 +158,9 @@ function Get-AbrAppVolPackage {
                                                 }
                                                 try {
 
-                                                    $OperatingSystems = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/operating_systems?"
-
+                                                    if ($PSVersionTable.PSEdition -eq 'Core') {
+                                                        $OperatingSystems = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/operating_systems"
+                                                    } else {$OperatingSystems = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/operating_systems"}
                                                     if ($OperatingSystems) {
                                                         section -ExcludeFromTOC -Style NOTOCHeading6 "Operating Systems" {
                                                             $OutObj = @()
