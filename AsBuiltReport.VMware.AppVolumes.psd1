@@ -27,7 +27,7 @@ Author = 'Chris Hildebrandt'
 #CompanyName = ''
 
 # Copyright statement for this module
-Copyright = '(c) 2022 Chris.Hildebrandt. All rights reserved.'
+Copyright = '(c) 2024 Chris.Hildebrandt. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'A PowerShell module to generate As built reports on the configuration of VMware AppVolumes'
@@ -54,7 +54,7 @@ PowerShellVersion = '5.1'
 RequiredModules = @(
     @{
         ModuleName = 'AsBuiltReport.Core';
-        ModuleVersion = '1.2.0'
+        ModuleVersion = '1.3.0'
     }
 )
 # Assemblies that must be loaded prior to importing this module
