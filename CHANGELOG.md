@@ -1,5 +1,21 @@
 # :arrows_clockwise: VMware AppVolumes As Built Report Changelog
 
+## [1.1.0] - 2023-1-1
+
+### Added
+
+- Updated Report to work with App Volumes 2309
+- Added Instances functions and many others
+- Improved functionaliy and layout.
+
+### Changed
+
+- Changed Required Modules to AsBuiltReport.Core v1.3.0
+
+### Fixed
+
+- Fixed issue with ssl certificate verification in PwSh <= 5 
+
 ## [0.2.0] - 2022-10-12
 
 ### Added

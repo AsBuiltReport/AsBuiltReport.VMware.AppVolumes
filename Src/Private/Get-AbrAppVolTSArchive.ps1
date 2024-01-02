@@ -1,4 +1,4 @@
-function Get-AbrAppVolADOU {
+function Get-AbrAppVolTSArchive {
     <#
     .SYNOPSIS
         Used by As Built Report to retrieve VMware APPVolume Active Directory OU information.
@@ -22,30 +22,28 @@ function Get-AbrAppVolADOU {
     )
 
     begin {
-        Write-PScriboMessage "ADOus InfoLevel set at $($InfoLevel.AppVolumes.ADOus)."
-        Write-PscriboMessage "Collecting Active Directory OU information."
+        Write-PScriboMessage "Troubleshooting Archive InfoLevel set at $($InfoLevel.AppVolumes.Troubleshooting)."
+        Write-PscriboMessage "Troubleshooting Archive information."
     }
 
     process {
-        if ($InfoLevel.AppVolumes.ADOUs -ge 1) {
+        if ($InfoLevel.AppVolumes.Troubleshooting -ge 1) {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
-                    $ActiveDirectoryOUs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/org_units"
-                } else {$ActiveDirectoryOUs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/org_units"}
+                    $TSAs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/troubleshooting_archive?"
+                } else {$TSAs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/troubleshooting_archive?"}
 
-                if ($ActiveDirectoryOUs) {
-                    section -Style Heading3 "Managed OU's" {
-                        Paragraph "The following section provide a summary of Organizational Units (OUs) that have assignments on $($AppVolServer.split('.')[0])."
+                if ($TSAs.trblarchive.data) {
+                    section -Style Heading3 "Troubleshooting Archives" {
+                        Paragraph "The following section provide a summary of troubleshooting archives for $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
-                        foreach ($ActiveDirectoryOU in $ActiveDirectoryOUs.org_units) {
+                        foreach ($TSA in $TSAs.trblarchive.data) {
                             try {
                                 $inObj = [ordered] @{
-                                    'Name' = $ActiveDirectoryOU.Name
-                                    'Last Logon' = $ActiveDirectoryOU.last_login_human.split()[0,1,2] -join ' '
-                                    'Status' = $ActiveDirectoryOU.status
-                                    'Writable' = $ActiveDirectoryOU.writables
-                                    'Assignments' = $ActiveDirectoryOU.application_assignment_count
+                                    'File Name' = $TSA.filename
+                                    'Status' = $TSA.Status
+                                    'Size' = $TSA.Size
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                             }
@@ -55,9 +53,9 @@ function Get-AbrAppVolADOU {
                         }
 
                         $TableParams = @{
-                            Name = "Managed OU's - $($AppVolServer)"
+                            Name = "Troubleshooting Archives - $($AppVolServer)"
                             List = $false
-                            ColumnWidths = 34, 24, 16, 12, 14
+                            ColumnWidths = 70, 15, 15
                         }
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"

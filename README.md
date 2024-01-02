@@ -1,7 +1,7 @@
 <!-- ********** DO NOT EDIT THESE LINKS ********** -->
 <p align="center">
     <a href="https://www.asbuiltreport.com/" alt="AsBuiltReport"></a>
-            <img src='https://raw.githubusercontent.com/AsBuiltReport/AsBuiltReport/master/AsBuiltReport.png' width="8%" height="8%" /></a>
+            <img src='https://avatars.githubusercontent.com/u/42958564' width="8%" height="8%" /></a>
 </p>
 <p align="center">
     <a href="https://www.powershellgallery.com/packages/AsBuiltReport.VMware.AppVolumes/" alt="PowerShell Gallery Version">
@@ -49,6 +49,7 @@ Below are the instructions on how to install, configure and generate a VMware Ap
 The VMware AppVolumes As Built Report supports the following AppVolumes versions;
 
 - Should work on version 4.+
+- Has been tested on all 230# Builds
 
 ### PowerShell
 This report is compatible with the following PowerShell versions;
@@ -64,12 +65,6 @@ PowerShell 5.1 or PowerShell 7, and the following PowerShell modules are require
 - [VMware PowerCLI Module](https://www.powershellgallery.com/packages/VMware.PowerCLI/)
 - [AsBuiltReport.VMware.AppVolumes Module](https://www.powershellgallery.com/packages/AsBuiltReport.VMware.AppVolumes/)
 
-### Linux & macOS
-* .NET Core is required for cover page image support on Linux and macOS operating systems.
-    * [Installing .NET Core for macOS](https://docs.microsoft.com/en-us/dotnet/core/install/macos)
-    * [Installing .NET Core for Linux](https://docs.microsoft.com/en-us/dotnet/core/install/linux)
-
-❗ If you are unable to install .NET Core, you must set `ShowCoverPageImage` to `False` in the report JSON configuration file.
 ### :closed_lock_with_key: Required Privileges
 
 * To generate a VMware AppVolumes report, a user account with the Admin role or higher on the AppVolumes is required. (Required Admin rights to use the AppVol APIs)
@@ -145,20 +140,29 @@ The table below outlines the default and maximum InfoLevel settings for each sec
 | Sub-Schema   | Default Setting | Maximum Setting |
 |--------------|:---------------:|:---------------:|
 General | 1 | 1 |
-Managers | 1 | 1 |
-License | 1 | 1 |
-AppStacks | 1 | 2 |
+Application | 1 | 2 |
+Package | 1 | 2 |
+Program | 1 | 2 |
+Assignment | 1 | 2 |
+Writeables | 1 | 2 |
 ADUsers | 1 | 1 |
+Computers | 1 | 1 |
 ADGroups | 1 | 1 |
 ADOUs | 1 | 1 |
-Writeables | 1 | 2 |
+Machines | 1 | 1 |
 StorageLocations | 1 | 2 |
 StorageGroups | 1 | 1 |
-ADDomains | 1 | 1 |
-AdminGroups | 1 | 1 |
-MachineManagers | 1 | 1 |
+Instance | 1 | 2 |
+Jobs | 1 | 1 |
+Troubleshooting | 1 | 1 |
+License | 1 | 1 |
+ADDomains | 1 | 2 |
+AdminGroups | 1 | 2 |
+MachineManagers | 1 | 2 |
 Storage | 1 | 1 |
+Managers | 1 | 1 |
 Settings | 1 | 1 |
+
 
 ### Healthcheck
 The **Healthcheck** schema is used to toggle health checks on or off.

@@ -5,7 +5,7 @@ function Get-AbrAPPVolManager {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -35,39 +35,75 @@ function Get-AbrAPPVolManager {
 
                 if ($Managers) {
                     $OutObj = @()
-                    section -Style Heading3 "Manager Servers" {
+                    section -Style Heading3 "App Volumes Manager Servers" {
+                        Paragraph "The following section details all the App Volumes manager servers on $($AppVolServer.split('.')[0])."
+                        BlankLine
                         foreach($Manager in $Managers.services | Sort-Object -Property Name) {
-                            section -Style Heading4 $Manager.name {
+                            section -Style Heading4 "App Volumes Manager Server Details - $($AppVolServer.split('.')[0])" {
                                 try {
                                     $inObj = [ordered] @{
-                                        'Product Version' = $Manager.product_version
-                                        'Internal Version' = $Manager.internal_version
-                                        'Domain Name' = $Manager.domain_name
-                                        'Computer Name' = $Manager.computer_name
-                                        'Computer FQDN' = $Manager.fqdn
-                                        'Registered' = ConvertTo-TextYN $Manager.registered
-                                        'Secure' = ConvertTo-TextYN $Manager.secure
+                                        'Manager Name' = $Manager.name
+                                        'Version' = $Manager.internal_version
                                         'Status' = $Manager.status
-                                        'First Seen At' = $Manager.first_seen_at_human
-                                        'Last Seen At' = $Manager.last_seen_at_human
+                                        'First Seen' = $Manager.first_seen_at_human
+                                        'Last Seen' = $Manager.last_seen_at_human
                                     }
-                                    $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
-
-                                    $TableParams = @{
-                                        Name = "Manager Server - $($Manager.name)"
-                                        List = $true
-                                        ColumnWidths = 50, 50
-                                    }
-                                    if ($Report.ShowTableCaptions) {
-                                        $TableParams['Caption'] = "- $($TableParams.Name)"
-                                    }
-                                    $OutObj | Table @TableParams
+                                    $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                                 }
                                 catch {
                                     Write-PscriboMessage -IsWarning $_.Exception.Message
                                 }
+
+                                $TableParams = @{
+                                    Name = "App Volumes Manager Server Details - $($AppVolServer.split('.')[0])"
+                                    List = $false
+                                    ColumnWidths = 30, 36, 10, 12, 12
+                                }
+                                if ($Report.ShowTableCaptions) {
+                                    $TableParams['Caption'] = "- $($TableParams.Name)"
+                                }
+                                $OutObj | Table @TableParams
+
                             }
                         }
+                        if ($InfoLevel.AppVolumes.Managers -ge 2) {
+                            $OutObj = @()
+                            foreach($Manager in $Managers.services | Sort-Object -Property Name) {
+                                section -ExcludeFromTOC -Style NOTOCHeading5 "Manager Servers Details - $($Manager.name)" {
+                                        try {
+                                        $inObj = [ordered] @{
+                                            'Product Version' = $Manager.product_version
+                                            'Internal Version' = $Manager.internal_version
+                                            'Domain Name' = $Manager.domain_name
+                                            'Computer Name' = $Manager.computer_name
+                                            'Computer FQDN' = $Manager.fqdn
+                                            'Registered' = ConvertTo-TextYN $Manager.registered
+                                            'Secure' = ConvertTo-TextYN $Manager.secure
+                                            'Status' = $Manager.status
+                                            'First Seen At' = $Manager.first_seen_at_human
+                                            'Last Seen At' = $Manager.last_seen_at_human
+                                        }
+                                        $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
+
+                                        $TableParams = @{
+                                            Name = "Manager Servers Details - $($Manager.name)"
+                                            List = $true
+                                            ColumnWidths = 50, 50
+                                        }
+                                        if ($Report.ShowTableCaptions) {
+                                            $TableParams['Caption'] = "- $($TableParams.Name)"
+                                        }
+                                        $OutObj | Table @TableParams
+                                    }
+                                    catch {
+                                        Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    }
+                                }
+                            }
+
+
+                        }
+
                     }
                 }
             }

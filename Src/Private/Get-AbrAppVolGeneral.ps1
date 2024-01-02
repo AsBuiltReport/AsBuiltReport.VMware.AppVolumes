@@ -5,7 +5,7 @@ function Get-AbrAPPVolGeneral {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -32,7 +32,17 @@ function Get-AbrAPPVolGeneral {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $GeneralAppInfo = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"
                 } else {$GeneralAppInfo = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"}
-                if ($GeneralAppInfo) {
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
+                } else {$LDAPDomains = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"}
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
+                } else {$Managers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"}
+                if ($PSVersionTable.PSEdition -eq 'Core') {
+                    $MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
+                } else {$MachineManagers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"}
+
+                if ($GeneralAppInfo -and $LDAPDomains -and $Managers) {
                     $OutObj = @()
                     section -Style Heading2 "General Information" {
                         Paragraph "The following section provide a summary of common information on $($AppVolServer.split('.')[0])."
@@ -42,13 +52,16 @@ function Get-AbrAPPVolGeneral {
                             'Version' = $GeneralAppInfo.version
                             'Configured' = ConvertTo-TextYN $GeneralAppInfo.configured
                             'Uptime' = $GeneralAppInfo.uptime
+                            'Number of Domains' = ($LDAPDomains.ldap_domains).count
+                            'Number of App Volumes Managers' = ($Managers.services).count
+                            'Number of vCenters' = ($MachineManagers.machine_managers).Count
                         }
                         $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 
                         $TableParams = @{
                             Name = "General Information - $($AppVolServer)"
                             List = $true
-                            ColumnWidths = 50, 50
+                            ColumnWidths = 40, 60
                         }
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"

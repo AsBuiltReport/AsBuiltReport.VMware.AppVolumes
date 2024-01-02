@@ -1,4 +1,4 @@
-function Get-AbrAppVolADOU {
+function Get-AbrAppVolJob {
     <#
     .SYNOPSIS
         Used by As Built Report to retrieve VMware APPVolume Active Directory OU information.
@@ -22,30 +22,29 @@ function Get-AbrAppVolADOU {
     )
 
     begin {
-        Write-PScriboMessage "ADOus InfoLevel set at $($InfoLevel.AppVolumes.ADOus)."
-        Write-PscriboMessage "Collecting Active Directory OU information."
+        Write-PScriboMessage "Jobs InfoLevel set at $($InfoLevel.AppVolumes.Jobs)."
+        Write-PscriboMessage "Collecting Job information."
     }
 
     process {
-        if ($InfoLevel.AppVolumes.ADOUs -ge 1) {
+        if ($InfoLevel.AppVolumes.Jobs -ge 1) {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
-                    $ActiveDirectoryOUs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/org_units"
-                } else {$ActiveDirectoryOUs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/org_units"}
+                    $Jobs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/jobs"
+                } else {$Jobs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/jobs"}
 
-                if ($ActiveDirectoryOUs) {
-                    section -Style Heading3 "Managed OU's" {
-                        Paragraph "The following section provide a summary of Organizational Units (OUs) that have assignments on $($AppVolServer.split('.')[0])."
+                if ($Jobs) {
+                    section -Style Heading3 "Scheduled Jobs" {
+                        Paragraph "The following section provide a summary of scheduled jobs for $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
-                        foreach ($ActiveDirectoryOU in $ActiveDirectoryOUs.org_units) {
+                        foreach ($Job in $Jobs.jobs) {
                             try {
                                 $inObj = [ordered] @{
-                                    'Name' = $ActiveDirectoryOU.Name
-                                    'Last Logon' = $ActiveDirectoryOU.last_login_human.split()[0,1,2] -join ' '
-                                    'Status' = $ActiveDirectoryOU.status
-                                    'Writable' = $ActiveDirectoryOU.writables
-                                    'Assignments' = $ActiveDirectoryOU.application_assignment_count
+                                    'Name' = $Job.name
+                                    'Status' = $job.status
+                                    'Interval' = $Job.interval_in_words
+                                    'Last Run At' = $Job.last_run_at
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                             }
@@ -55,9 +54,9 @@ function Get-AbrAppVolADOU {
                         }
 
                         $TableParams = @{
-                            Name = "Managed OU's - $($AppVolServer)"
+                            Name = "Scheduled Jobs - $($AppVolServer)"
                             List = $false
-                            ColumnWidths = 34, 24, 16, 12, 14
+                            ColumnWidths = 30, 20, 30, 20
                         }
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
