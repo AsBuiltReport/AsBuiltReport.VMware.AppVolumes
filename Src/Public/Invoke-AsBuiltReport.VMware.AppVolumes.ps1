@@ -25,6 +25,23 @@
         [String] $StylePath
     )
 
+    if ($PSVersionTable.PSEdition -ne 'Core') {
+        add-type @"
+    using System.Net;
+    using System.Security.Cryptography.X509Certificates;
+    public class TrustAllCertsPolicy : ICertificatePolicy {
+        public bool CheckValidationResult(
+            ServicePoint srvPoint, X509Certificate certificate,
+            WebRequest request, int certificateProblem) {
+            return true;
+        }
+    }
+"@
+[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+
+    }
+
+
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
     Write-PScriboMessage -IsWarning "Please refer to the AsBuiltReport.VMware.AppVolumes github website for more detailed information about this project."
