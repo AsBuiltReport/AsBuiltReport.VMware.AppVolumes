@@ -8,6 +8,14 @@
 - Added Instances functions and many others
 - Improved functionaliy and layout.
 
+### Changed
+
+- Changed Required Modules to AsBuiltReport.Core v1.3.0
+
+### Fixed
+
+- Fixed issue with ssl certificate verification in PwSh <= 5 
+
 ## [0.2.0] - 2022-10-12
 
 ### Added
