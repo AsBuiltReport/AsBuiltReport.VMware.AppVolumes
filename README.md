@@ -49,6 +49,7 @@ Below are the instructions on how to install, configure and generate a VMware Ap
 The VMware AppVolumes As Built Report supports the following AppVolumes versions;
 
 - Should work on version 4.+
+- Has been tested on all 230# Builds
 
 ### PowerShell
 This report is compatible with the following PowerShell versions;
@@ -139,20 +140,29 @@ The table below outlines the default and maximum InfoLevel settings for each sec
 | Sub-Schema   | Default Setting | Maximum Setting |
 |--------------|:---------------:|:---------------:|
 General | 1 | 1 |
-Managers | 1 | 1 |
-License | 1 | 1 |
-AppStacks | 1 | 2 |
+Application | 1 | 2 |
+Package | 1 | 2 |
+Program | 1 | 2 |
+Assignment | 1 | 2 |
+Writeables | 1 | 2 |
 ADUsers | 1 | 1 |
+Computers | 1 | 1 |
 ADGroups | 1 | 1 |
 ADOUs | 1 | 1 |
-Writeables | 1 | 2 |
+Machines | 1 | 1 |
 StorageLocations | 1 | 2 |
 StorageGroups | 1 | 1 |
-ADDomains | 1 | 1 |
-AdminGroups | 1 | 1 |
-MachineManagers | 1 | 1 |
+Instance | 1 | 2 |
+Jobs | 1 | 1 |
+Troubleshooting | 1 | 1 |
+License | 1 | 1 |
+ADDomains | 1 | 2 |
+AdminGroups | 1 | 2 |
+MachineManagers | 1 | 2 |
 Storage | 1 | 1 |
+Managers | 1 | 1 |
 Settings | 1 | 1 |
+
 
 ### Healthcheck
 The **Healthcheck** schema is used to toggle health checks on or off.

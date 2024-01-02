@@ -5,7 +5,7 @@
     .DESCRIPTION
         Documents the configuration of VMware AppVolumes in Word/HTML/XML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -25,12 +25,46 @@
         [String] $StylePath
     )
 
+    if ($PSVersionTable.PSEdition -ne 'Core') {
+
+        add-type @"
+    using System.Net;
+    using System.Security.Cryptography.X509Certificates;
+    public class TrustAllCertsPolicy : ICertificatePolicy {
+        public bool CheckValidationResult(
+            ServicePoint srvPoint, X509Certificate certificate,
+            WebRequest request, int certificateProblem) {
+            return true;
+        }
+    }
+"@
+[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+
+    }
+
+
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
     Write-PScriboMessage -IsWarning "Please refer to the AsBuiltReport.VMware.AppVolumes github website for more detailed information about this project."
     Write-PScriboMessage -IsWarning "Do not forget to update your report configuration file after each new version release."
     Write-PScriboMessage -IsWarning "Documentation: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes"
     Write-PScriboMessage -IsWarning "Issues or bug reporting: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/issues"
+
+    # Check the current AsBuiltReport.VMware.AppVolumes installed module
+    Try {
+        $InstalledVersion = Get-Module -ListAvailable -Name AsBuiltReport.VMware.AppVolumes -ErrorAction SilentlyContinue | Sort-Object -Property Version -Descending | Select-Object -First 1 -ExpandProperty Version
+
+        if ($InstalledVersion) {
+            Write-PScriboMessage -IsWarning "AsBuiltReport.VMware.AppVolumes $($InstalledVersion.ToString()) is currently installed."
+            $LatestVersion = Find-Module -Name AsBuiltReport.Veeam.VBR -Repository PSGallery -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Version
+            if ($LatestVersion -gt $InstalledVersion) {
+                Write-PScriboMessage -IsWarning "AsBuiltReport.VMware.AppVolumes $($LatestVersion.ToString()) is available."
+                Write-PScriboMessage -IsWarning "Run 'Update-Module -Name AsBuiltReport.VMware.AppVolumes -Force' to install the latest version."
+            }
+        }
+    } Catch {
+            Write-PscriboMessage -IsWarning $_.Exception.Message
+        }
 
     # Check if the required version of VMware PowerCLI is installed
     Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.7'
@@ -66,21 +100,30 @@
                     Paragraph "The following section provides a summary of the implemented components on the VMware App Volumes infrastructure."
                     Get-AbrAPPVolGeneral
                     section -Style Heading2 "Inventory" {
-                        Get-AbrAppVolAppstack
+                        Get-AbrAPPVolApplication
+                        Get-AbrAppVolPackage
+                        Get-AbrAppVolProgram
+                        Get-AbrAppVolAssignment
                         Get-AbrAppVolWritable
+                        #Get-AbrAppVolAppstack
                     }
                     section -Style Heading2 "Directory" {
                         Get-AbrAppVolADUser
+                        Get-AbrAppVolComputer
                         Get-AbrAppVolADGroup
                         Get-AbrAppVolADOU
                     }
                     section -Style Heading2 "Infrastructure" {
+                        Get-AbrAppVolMachine
                         Get-AbrAppVolStorage
                         Get-AbrAppVolStorageGroup
+                        Get-AbrAppVolInstance
+                    }
+                    section -Style Heading2 "Activity" {
+                        Get-AbrAppVolJob
+                        Get-AbrAppVolTSArchive
                     }
                     section -Style Heading2 "Configuration" {
-                        Paragraph "The following section details configuration settings for App Volumes Manager $($AppVolServer.split('.')[0])."
-                        Blankline
                         Get-AbrAppVolLicense
                         Get-AbrAppVolADDomain
                         Get-AbrAppVolAdminRole

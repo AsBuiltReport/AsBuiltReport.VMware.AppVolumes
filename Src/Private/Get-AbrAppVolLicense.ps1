@@ -5,7 +5,7 @@ function Get-AbrAPPVolLicense {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -36,6 +36,9 @@ function Get-AbrAPPVolLicense {
                 if ($License) {
                     $OutObj = @()
                     section -Style Heading3 "License Information" {
+                        Paragraph "The following section details license information for $($AppVolServer.split('.')[0])."
+                        BlankLine
+
                         Switch ($License.license.invalid)
                         {
                             'True' {$LicenseInvalid = 'False' }

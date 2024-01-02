@@ -5,7 +5,7 @@ function Get-AbrAppVolWritable {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        0.2.0
+        Version:        1.1.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -34,18 +34,18 @@ function Get-AbrAppVolWritable {
                 } else {$Writables = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/writables"}
 
                 if ($Writables) {
-                    section -Style Heading3 "Writable AppStack" {
-                        Paragraph "The following section provide a summary of Writable AppStack components on $($AppVolServer.split('.')[0])."
+                    section -Style Heading3 "Writable Volumes" {
+                        Paragraph "The following section provide a summary of writable volumes on $($AppVolServer.split('.')[0])."
                         Blankline
                         $OutObj = @()
                         foreach ($Writable in $Writables.data) {
                             try {
                                 $inObj = [ordered] @{
-                                    'Name' = $Writable.Name
-                                    'Owner Type' = $Writable.Owner_Type
+                                    'Owner' = $Writable.name
+                                    'Storage' = $Writable.Datastore_Name
                                     'Status' = $Writable.Status
-                                    'Size Total/Free' =  "$([math]::Round(($Writable.total_mb / 1024)))GB / $([math]::Round(($Writable.free_mb / 1024)))GB"
-                                    'Datastore Name' = $Writable.Datastore_Name
+                                    'Created' = $Writable.created_at_Human
+                                    'State' = $Writable.attached
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                             }
@@ -55,23 +55,21 @@ function Get-AbrAppVolWritable {
                         }
 
                         $TableParams = @{
-                            Name = "Writable AppStack - $($AppVolServer)"
+                            Name = "Writable Volumes - $($AppVolServer)"
                             List = $false
-                            ColumnWidths = 30, 15, 15, 15, 25
+                            ColumnWidths = 25, 20, 15, 15, 25
                         }
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
                         $OutObj | Sort-Object -Property Name | Table @TableParams
                         if ($InfoLevel.AppVolumes.Writables -ge 2) {
-                            section -Style Heading4 "Writable AppStack Details" {
-                                Paragraph "The following section details Writable AppStack settings configured on $($AppVolServer.split('.')[0])."
-                                Blankline
+                            section -Style Heading4 "Writable Volume Details" {
                                 foreach ($Writable in $Writables.data | Sort-Object -Property Name) {
                                     try {
-                                        section -ExcludeFromTOC -Style NOTOCHeading5 $Writable.Name {
+                                        section -ExcludeFromTOC -Style NOTOCHeading5 "Writable Volume Details for - $($Writable.Name)" {
                                             $inObj = [ordered] @{
-                                                'Owner' = $Writable.Owner_name
+                                                'Owner' = $Writable.name
                                                 'Owner Type' = $Writable.Owner_Type
                                                 'Created Date' = $Writable.created_at_Human
                                                 'Last Updated Date' = $Writable.updated_At_human
@@ -91,14 +89,14 @@ function Get-AbrAppVolWritable {
                                                 'File Name' = $Writable.filename
                                                 'Path' = $Writable.path
                                                 'Datastore Name' = $Writable.Datastore_Name
-                                                'Datastore Protected' = $WritablesIDSource.protected
-                                                'Datastore Can Expand' = $WritablesIDSource.can_expand
-                                                'OS Version' = $WritablesIDSource.primordial_os_name
+                                                'Datastore Protected' = $Writable.datastore_host.protected
+                                                'Datastore Can Expand' = $Writable.can_expand
+                                                'OS Version' = $Writable.datastore_host.primordial_os_name
                                             }
                                             $OutObj = [pscustomobject](ConvertTo-HashToYN $inObj)
 
                                             $TableParams = @{
-                                                Name = "Writable AppStack - $($Writable.Name)"
+                                                Name = "Writable volumes details - $($Writable.Name)"
                                                 List = $true
                                                 ColumnWidths = 50, 50
                                             }
