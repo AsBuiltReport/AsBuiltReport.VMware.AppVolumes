@@ -37,34 +37,31 @@ function Get-AbrAppVolMachineManager {
                     section -Style Heading3 "Machine Managers" {
                         Paragraph "The following section provide a summary of machine managers for $($AppVolServer.split('.')[0])."
                         BlankLine
-                        $OutObj = @()
-                        foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
-                            section -Style Heading4 "Machine Manager Summary" {
-                                $OutObj = @()
-                                foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
-                                    try {
-                                        $inObj = [ordered] @{
-                                            'Host' = $MachineManager.host
-                                            "Username" = $MachineManager.username
-                                            'Type' = $MachineManager.type
-                                        }
-                                        $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
+                        section -Style Heading4 "Machine Manager Summary" {
+                            $OutObj = @()
+                            foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
+                                try {
+                                    $inObj = [ordered] @{
+                                        'Host' = $MachineManager.host
+                                        "Username" = $MachineManager.username
+                                        'Type' = $MachineManager.type
                                     }
-                                    catch {
-                                        Write-PscriboMessage -IsWarning $_.Exception.Message
-                                    }
+                                    $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                                 }
-
-                                $TableParams = @{
-                                    Name = "Machine Managers - $($AppVolServer)"
-                                    List = $false
-                                    ColumnWidths = 40, 40, 20
+                                catch {
+                                    Write-PscriboMessage -IsWarning $_.Exception.Message
                                 }
-                                if ($Report.ShowTableCaptions) {
-                                    $TableParams['Caption'] = "- $($TableParams.Name)"
-                                }
-                                $OutObj | Table @TableParams
                             }
+
+                            $TableParams = @{
+                                Name = "Machine Managers - $($AppVolServer)"
+                                List = $false
+                                ColumnWidths = 40, 40, 20
+                            }
+                            if ($Report.ShowTableCaptions) {
+                                $TableParams['Caption'] = "- $($TableParams.Name)"
+                            }
+                            $OutObj | Table @TableParams
                         }
 
                         if ($InfoLevel.AppVolumes.MachineManagers -ge 2) {
