@@ -33,7 +33,7 @@ function Get-AbrAppVolTSArchive {
                     $TSAs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/troubleshooting_archive?"
                 } else {$TSAs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/troubleshooting_archive?"}
 
-                if ($TSAs) {
+                if ($TSAs.trblarchive.data) {
                     section -Style Heading3 "Troubleshooting Archives" {
                         Paragraph "The following section provide a summary of troubleshooting archives for $($AppVolServer.split('.')[0])."
                         BlankLine

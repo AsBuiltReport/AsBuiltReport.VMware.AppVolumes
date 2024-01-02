@@ -33,7 +33,7 @@ function Get-AbrAPPVolApplication {
                     $Products = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products"
                 } else {$Products = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products"}
 
-                if ($Products) {
+                if ($Products.data) {
                     section -Style Heading3 'Application Summary' {
                         Paragraph "The following section provide a summary of the applications captured on $($AppVolServer.split('.')[0])."
                         Blankline
@@ -153,7 +153,7 @@ function Get-AbrAPPVolApplication {
                                                                     $ProductPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_packages/$ProductPackage/programs"
                                                                 } else {$ProductPrograms = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_packages/$ProductPackage/programs"}
 
-                                                                if ($ProductPrograms) {
+                                                                if ($ProductPrograms.data) {
                                                                     section -ExcludeFromTOC -Style NOTOCHeading6 "Application Programs" {
                                                                         $OutObj = @()
                                                                         foreach ($Program in $ProductPrograms.data) {
@@ -191,7 +191,7 @@ function Get-AbrAPPVolApplication {
                                                         $ProductAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/assignments?include=entities"
                                                     } else {$ProductAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/assignments?include=entities"}
 
-                                                    if ($ProductAssignments) {
+                                                    if ($ProductAssignments.data) {
                                                         section -ExcludeFromTOC -Style NOTOCHeading6 "Application Assignment" {
                                                             $OutObj = @()
                                                             foreach ($ProductAssignment in $ProductAssignments.data) {

@@ -33,7 +33,7 @@ function Get-AbrAppVolPackage {
                     $AppPackages = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages?include=app_markers%2Clifecycle_stage%2Cbase_app_package%2Capp_product"
                 } else {$AppPackages = Invoke-RestMethod -WebSession $SourceServerSession -Method get -Uri "https://$AppVolServer/app_volumes/app_packages?include=app_markers%2Clifecycle_stage%2Cbase_app_package%2Capp_product"}
 
-                if ($AppPackages) {
+                if ($AppPackages.data) {
                     section -Style Heading3 'Packages Summary' {
                         Paragraph "The following section provide a summary of the packages on $($AppVolServer.split('.')[0])."
                         Blankline
@@ -119,7 +119,7 @@ function Get-AbrAppVolPackage {
                                                         $Programs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/programs"
                                                     } else {$Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/programs"}
                                                     Write-PscriboMessage "Working on Programs for $($AppPackage.Name)."
-                                                    if ($Programs) {
+                                                    if ($Programs.data) {
                                                         section -ExcludeFromTOC -Style NOTOCHeading6 "Programs" {
                                                             $OutObj = @()
                                                             foreach ($Program in $Programs.data) {
@@ -161,7 +161,7 @@ function Get-AbrAppVolPackage {
                                                     if ($PSVersionTable.PSEdition -eq 'Core') {
                                                         $OperatingSystems = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/operating_systems"
                                                     } else {$OperatingSystems = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/operating_systems"}
-                                                    if ($OperatingSystems) {
+                                                    if ($OperatingSystems.data) {
                                                         section -ExcludeFromTOC -Style NOTOCHeading6 "Operating Systems" {
                                                             $OutObj = @()
                                                             foreach ($OS in $OperatingSystems.data) {
@@ -195,7 +195,7 @@ function Get-AbrAppVolPackage {
                                                         $StorageLocations = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/files?"
                                                     } else {$StorageLocations = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/files?"}
 
-                                                    if ($StorageLocations) {
+                                                    if ($StorageLocations.data) {
                                                         section -ExcludeFromTOC -Style NOTOCHeading6 "Storage Locations for - $($AppPackage.Name)" {
                                                             $OutObj = @()
                                                             foreach ($StorageLocation in $StorageLocations.data) {
@@ -233,7 +233,7 @@ function Get-AbrAppVolPackage {
                                                         $AppLinks = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/app_links?"
                                                     } else {$AppLinks = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($AppPackage.id)/app_links?"}
 
-                                                    if ($AppLinks) {
+                                                    if ($AppLinks.data) {
                                                         section -ExcludeFromTOC -Style NOTOCHeading6 "Application links for - $($AppPackage.Name)" {
                                                             $OutObj = @()
                                                             foreach ($AppLink in $AppLinks.data) {

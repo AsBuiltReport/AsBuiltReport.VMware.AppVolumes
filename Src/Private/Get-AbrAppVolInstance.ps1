@@ -33,37 +33,39 @@ function Get-AbrAppVolInstance {
                     $Instances = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/manager_instances/related?api_version=4050"
                 } else {$Instances = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/manager_instances/related?api_version=4050"}
 
-                if ($Instances) {
+                if ($Instances.data) {
                     section -Style Heading3 "App Volumes Instances" {
                         Paragraph "The following section provide a summary of App Volumes Instances for $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
                         foreach ($Instance in $Instances.data) {
+                            if($Instance){
 
-                            # Calculate Sync Count
-                            $SyncCount = [int]$Instance.attributes.application_sync_count + [int]$Instance.attributes.package_sync_count + [int]$Instance.attributes.assignment_sync_count + [int]$Instance.attributes.marker_sync_count
+                                # Calculate Sync Count
+                                $SyncCount = [int]$Instance.attributes.application_sync_count + [int]$Instance.attributes.package_sync_count + [int]$Instance.attributes.assignment_sync_count + [int]$Instance.attributes.marker_sync_count
 
-                            # Determine Instance Type
-                            If($Instance.attributes.is_source -eq 'True'){
-                                $InstanceType = 'Source'
-                            }
-                            else{
-                                $InstanceType = 'Target'
-                            }
-
-                            try {
-                                $inObj = [ordered] @{
-                                    'Name' = $Instance.attributes.Name
-                                    'Host' = $Instance.attributes.Host
-                                    'Type' = $InstanceType
-                                    'Status' = $Instance.attributes.Status
-                                    'Sync Count' = ($SyncCount).ToString()
-                                    'Last Sync' = $Instance.attributes.synchronized_at_human
+                                # Determine Instance Type
+                                If($Instance.attributes.is_source -eq 'True'){
+                                    $InstanceType = 'Source'
                                 }
-                                $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                                else{
+                                    $InstanceType = 'Target'
+                                }
+
+                                try {
+                                    $inObj = [ordered] @{
+                                        'Name' = $Instance.attributes.Name
+                                        'Host' = $Instance.attributes.Host
+                                        'Type' = $InstanceType
+                                        'Status' = $Instance.attributes.Status
+                                        'Sync Count' = ($SyncCount).ToString()
+                                        'Last Sync' = $Instance.attributes.synchronized_at_human
+                                    }
+                                    $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
+                                }
+                                catch {
+                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                }
                             }
                         }
 

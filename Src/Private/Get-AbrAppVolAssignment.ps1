@@ -40,10 +40,14 @@ function Get-AbrAppVolAssignment {
                         $OutObj = @()
                         foreach ($AA in $AssignmentsAll.data | Sort-Object -Property Name) {
                             if($aa.app_marker){
-                                $Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_marker.app_package.id)/programs?"
+                                if ($PSVersionTable.PSEdition -eq 'Core') {
+                                    $Programs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_marker.app_package.id)/programs?"
+                                } else {$Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_marker.app_package.id)/programs?"}
                                 $JoinedNames = ($Programs.data | ForEach-Object { $_.Name }) -join ', '
                             }elseif ($aa.app_package) {
-                                $Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_package.id)/programs?"
+                                if ($PSVersionTable.PSEdition -eq 'Core') {
+                                    $Programs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_package.id)/programs?"
+                                } else {$Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_package.id)/programs?"}
                                 $JoinedNames = ($Programs.data | ForEach-Object { $_.Name }) -join ', '
                             }
 

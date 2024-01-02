@@ -40,20 +40,23 @@ function Get-AbrAppVolMachineManager {
                         $OutObj = @()
                         foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
                             section -Style Heading4 "Machine Manager Summary" {
-                                try {
-                                    $inObj = [ordered] @{
-                                        'Host' = $MachineManager.host
-                                        "Username" = $MachineManagerDetail.machine_manager.host_username
-                                        'Type' = $MachineManager.type
+                                $OutObj = @()
+                                foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
+                                    try {
+                                        $inObj = [ordered] @{
+                                            'Host' = $MachineManager.host
+                                            "Username" = $MachineManager.username
+                                            'Type' = $MachineManager.type
+                                        }
+                                        $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
                                     }
-                                    $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                                }
-                                catch {
-                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    catch {
+                                        Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    }
                                 }
 
                                 $TableParams = @{
-                                    Name = "Machine Manager - $($MachineManager.host)"
+                                    Name = "Machine Managers - $($AppVolServer)"
                                     List = $false
                                     ColumnWidths = 40, 40, 20
                                 }
