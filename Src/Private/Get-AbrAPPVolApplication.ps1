@@ -82,6 +82,22 @@ function Get-AbrAPPVolApplication {
                                             $ProductIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"
                                         } else {$ProductIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"}
 
+                                        if ($PSVersionTable.PSEdition -eq 'Core') {
+                                            $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
+                                        } else {$ActiveDirectoryUsers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"}
+
+                                        foreach ($ActiveDirectoryUser in $ActiveDirectoryUsers) {
+                                            if($ActiveDirectoryUser){
+                                                if ($PSVersionTable.PSEdition -eq 'Core') {
+                                                    $UserDetails = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users/$($ActiveDirectoryUser.id)"
+                                                } else {$UserDetails = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users/$($ActiveDirectoryUser.id)"}
+                                                if($UserDetails.object_guid -like $Product.Owner_Guid){
+                                                    $OwnerName = $UserDetails.upn
+                                                    Break
+                                                }
+                                            }
+                                        }
+
                                         $ProductPackage =  $ProductIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
                                         if ($Product) {
                                             section -Style Heading5 "Application Details - $($Product.Name)" {
@@ -89,7 +105,7 @@ function Get-AbrAPPVolApplication {
                                                 $inObj = [ordered] @{
                                                     'Name' = $Product.Name
                                                     'Status' = $Product.Status
-                                                    'Owner' = $Product.Owner_Guid
+                                                    'Owner' = $OwnerName
                                                     'Total Assignments' = $Product.assignment_count
                                                     'Created' = $Product.created_At_Human
                                                     'Modified' = $Product.updated_at_human
