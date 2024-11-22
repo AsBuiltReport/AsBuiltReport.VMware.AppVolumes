@@ -1,6 +1,6 @@
 # :arrows_clockwise: VMware AppVolumes As Built Report Changelog
 
-## [1.2.0] - 2023-11-21
+## [1.2.0] - 2024-11-21
 
 ### Added
 
