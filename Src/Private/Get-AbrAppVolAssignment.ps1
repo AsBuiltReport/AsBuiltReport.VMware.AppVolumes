@@ -5,7 +5,7 @@ function Get-AbrAppVolAssignment {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolAssignment {
 
     begin {
         Write-PScriboMessage "Assignment InfoLevel set at $($InfoLevel.AppVolumes.Assignments)."
-        Write-PscriboMessage "Collecting Assignment information."
+        Write-PScriboMessage "Collecting Assignment information."
     }
 
     process {
@@ -31,39 +31,37 @@ function Get-AbrAppVolAssignment {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $AssignmentsAll = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_assignments?include=entities,filters,app_package,app_marker&"
-                } else {$AssignmentsAll = Invoke-RestMethod -WebSession $SourceServerSession -Method get -Uri "https://$AppVolServer/app_volumes/app_assignments?include=entities,filters,app_package,app_marker&"}
+                } else { $AssignmentsAll = Invoke-RestMethod -WebSession $SourceServerSession -Method get -Uri "https://$AppVolServer/app_volumes/app_assignments?include=entities,filters,app_package,app_marker&" }
 
                 if ($AssignmentsAll) {
-                    section -Style Heading3 'Assignments Summary' {
+                    Section -Style Heading3 'Assignments Summary' {
                         Paragraph "The following section provide a summary of the assignments on $($AppVolServer.split('.')[0])."
-                        Blankline
+                        BlankLine
                         $OutObj = @()
                         foreach ($AA in $AssignmentsAll.data | Sort-Object -Property Name) {
-                            if($aa.app_marker){
+                            if ($aa.app_marker) {
                                 if ($PSVersionTable.PSEdition -eq 'Core') {
                                     $Programs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_marker.app_package.id)/programs?"
-                                } else {$Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_marker.app_package.id)/programs?"}
+                                } else { $Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_marker.app_package.id)/programs?" }
                                 $JoinedNames = ($Programs.data | ForEach-Object { $_.Name }) -join ', '
-                            }elseif ($aa.app_package) {
+                            } elseif ($aa.app_package) {
                                 if ($PSVersionTable.PSEdition -eq 'Core') {
                                     $Programs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_package.id)/programs?"
-                                } else {$Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_package.id)/programs?"}
+                                } else { $Programs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$($aa.app_package.id)/programs?" }
                                 $JoinedNames = ($Programs.data | ForEach-Object { $_.Name }) -join ', '
                             }
 
                             # Filter Value
-                            If(!([string]::IsNullOrWhitespace($AA.Filters.value))){
+                            If (!([string]::IsNullOrWhitespace($AA.Filters.value))) {
                                 $filters = $AA.Filters.value
-                            }
-                            else{
+                            } else {
                                 $filters = 'All'
                             }
 
                             #App Marker Value
-                            If([string]::IsNullOrWhitespace($AA.app_marker_name)){
+                            If ([string]::IsNullOrWhitespace($AA.app_marker_name)) {
                                 $AppMarkerName = 'Package'
-                            }
-                            else{
+                            } else {
                                 $AppMarkerName = $AA.app_marker_name
                             }
 
@@ -78,9 +76,8 @@ function Get-AbrAppVolAssignment {
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
 
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
                         $TableParams = @{
@@ -94,9 +91,8 @@ function Get-AbrAppVolAssignment {
                         $OutObj | Sort-Object -Property Name | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

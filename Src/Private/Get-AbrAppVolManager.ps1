@@ -5,7 +5,7 @@ function Get-AbrAPPVolManager {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAPPVolManager {
 
     begin {
         Write-PScriboMessage "Manager InfoLevel set at $($InfoLevel.AppVolumes.Managers)."
-        Write-PscriboMessage "Collecting Manager information."
+        Write-PScriboMessage "Collecting Manager information."
     }
 
     process {
@@ -31,15 +31,15 @@ function Get-AbrAPPVolManager {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
-                } else {$Managers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"}
+                } else { $Managers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services" }
 
                 if ($Managers) {
                     $OutObj = @()
-                    section -Style Heading3 "App Volumes Manager Servers" {
+                    Section -Style Heading3 "App Volumes Manager Servers" {
                         Paragraph "The following section details all the App Volumes manager servers on $($AppVolServer.split('.')[0])."
                         BlankLine
-                        foreach($Manager in $Managers.services | Sort-Object -Property Name) {
-                            section -Style Heading4 "App Volumes Manager Server Details - $($AppVolServer.split('.')[0])" {
+                        foreach ($Manager in $Managers.services | Sort-Object -Property Name) {
+                            Section -Style Heading4 "App Volumes Manager Server Details - $($AppVolServer.split('.')[0])" {
                                 try {
                                     $inObj = [ordered] @{
                                         'Manager Name' = $Manager.name
@@ -49,9 +49,8 @@ function Get-AbrAPPVolManager {
                                         'Last Seen' = $Manager.last_seen_at_human
                                     }
                                     $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                                }
-                                catch {
-                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                } catch {
+                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                 }
 
                                 $TableParams = @{
@@ -68,9 +67,9 @@ function Get-AbrAPPVolManager {
                         }
                         if ($InfoLevel.AppVolumes.Managers -ge 2) {
                             $OutObj = @()
-                            foreach($Manager in $Managers.services | Sort-Object -Property Name) {
-                                section -ExcludeFromTOC -Style NOTOCHeading5 "Manager Servers Details - $($Manager.name)" {
-                                        try {
+                            foreach ($Manager in $Managers.services | Sort-Object -Property Name) {
+                                Section -ExcludeFromTOC -Style NOTOCHeading5 "Manager Servers Details - $($Manager.name)" {
+                                    try {
                                         $inObj = [ordered] @{
                                             'Product Version' = $Manager.product_version
                                             'Internal Version' = $Manager.internal_version
@@ -94,9 +93,8 @@ function Get-AbrAPPVolManager {
                                             $TableParams['Caption'] = "- $($TableParams.Name)"
                                         }
                                         $OutObj | Table @TableParams
-                                    }
-                                    catch {
-                                        Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    } catch {
+                                        Write-PScriboMessage -IsWarning $_.Exception.Message
                                     }
                                 }
                             }
@@ -106,9 +104,8 @@ function Get-AbrAPPVolManager {
 
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

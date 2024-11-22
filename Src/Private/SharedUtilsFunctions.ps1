@@ -1,7 +1,7 @@
 function ConvertTo-TextYN {
     <#
     .SYNOPSIS
-    Used by As Built Report to convert true or false automatically to Yes or No.
+        Used by As Built Report to convert true or false automatically to Yes or No.
     .DESCRIPTION
 
     .NOTES
@@ -15,25 +15,23 @@ function ConvertTo-TextYN {
     #>
     [CmdletBinding()]
     [OutputType([String])]
-    Param
-        (
+    Param (
         [Parameter (
             Position = 0,
             Mandatory)]
-            [AllowEmptyString()]
-            [string]
-            $TEXT
-        )
+        [AllowEmptyString()]
+        [string] $TEXT
+    )
 
-    switch ($TEXT)
-        {
-            "" {"--"}
-            $Null {"--"}
-            "True" {"Yes"; break}
-            "False" {"No"; break}
-            default {$TEXT}
-        }
-    } # end
+    switch ($TEXT) {
+        "" { "--"; break }
+        " " { "--"; break }
+        $Null { "--"; break }
+        "True" { "Yes"; break }
+        "False" { "No"; break }
+        default { $TEXT }
+    }
+} # end
 function Get-UnixDate ($UnixDate) {
         <#
     .SYNOPSIS
@@ -163,27 +161,28 @@ function ConvertTo-FileSizeString {
     Used by As Built Report to convert bytes automatically to GB or TB based on size.
     .DESCRIPTION
     .NOTES
-        Version:        0.4.0
-        Author:         LEE DAILEY
+        Version:        0.1.0
+        Author:         Jonathan Colon
     .EXAMPLE
     .LINK
     #>
     [CmdletBinding()]
     [OutputType([String])]
-    Param (
+    Param
+    (
         [Parameter (
             Position = 0,
             Mandatory)]
-            [int64]
-            $Size
-            )
-    switch ($Size) {
-        {$_ -gt 1TB} {[string]::Format("{0:0} TB", $Size / 1TB); break}
-        {$_ -gt 1GB} {[string]::Format("{0:0} GB", $Size / 1GB); break}
-        {$_ -gt 1MB} {[string]::Format("{0:0} MB", $Size / 1MB); break}
-        {$_ -gt 1KB} {[string]::Format("{0:0} KB", $Size / 1KB); break}
-        {$_ -gt 0} {[string]::Format("{0} B", $Size); break}
-        {$_ -eq 0} {"0 KB"; break}
-        default {"0 KB"}
+        [int64]
+        $Size
+    )
+
+    $Unit = Switch ($Size) {
+        { $Size -gt 1PB } { 'PB' ; Break }
+        { $Size -gt 1TB } { 'TB' ; Break }
+        { $Size -gt 1GB } { 'GB' ; Break }
+        { $Size -gt 1Mb } { 'MB' ; Break }
+        Default { 'KB' }
     }
-} # end >> function Format-FileSize
+    return "$([math]::Round(($Size / $("1" + $Unit)), 0)) $Unit"
+} # end

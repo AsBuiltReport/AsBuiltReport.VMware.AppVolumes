@@ -1,11 +1,11 @@
-﻿function Invoke-AsBuiltReport.VMware.AppVolumes {
+function Invoke-AsBuiltReport.VMware.AppVolumes {
     <#
     .SYNOPSIS
         PowerShell script which documents the configuration of VMware AppVolumes in Word/HTML/XML/Text formats
     .DESCRIPTION
         Documents the configuration of VMware AppVolumes in Word/HTML/XML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -25,9 +25,14 @@
         [String] $StylePath
     )
 
+    if ($psISE) {
+        Write-Error -Message "You cannot run this script inside the PowerShell ISE. Please execute it from the PowerShell Command Window."
+        break
+    }
+
     if ($PSVersionTable.PSEdition -ne 'Core') {
 
-        add-type @"
+        Add-Type @"
     using System.Net;
     using System.Security.Cryptography.X509Certificates;
     public class TrustAllCertsPolicy : ICertificatePolicy {
@@ -38,17 +43,18 @@
         }
     }
 "@
-[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+        [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
     }
 
 
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
-    Write-PScriboMessage -IsWarning "Please refer to the AsBuiltReport.VMware.AppVolumes github website for more detailed information about this project."
-    Write-PScriboMessage -IsWarning "Do not forget to update your report configuration file after each new version release."
-    Write-PScriboMessage -IsWarning "Documentation: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes"
-    Write-PScriboMessage -IsWarning "Issues or bug reporting: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/issues"
+    Write-PScriboMessage -Plugin "Module" -IsWarning "Please refer to the AsBuiltReport.VMware.AppVolumes github website for more detailed information about this project."
+    Write-PScriboMessage -Plugin "Module" -IsWarning "Do not forget to update your report configuration file after each new version release."
+    Write-PScriboMessage -Plugin "Module" -IsWarning "Documentation: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes"
+    Write-PScriboMessage -Plugin "Module" -IsWarning "Issues or bug reporting: https://github.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/issues"
+    Write-PScriboMessage -Plugin "Module" -IsWarning "This project is community maintained and has no sponsorship from VMware/Omnissa, its employees or any of its affiliates."
 
     # Check the current AsBuiltReport.VMware.AppVolumes installed module
     Try {
@@ -63,8 +69,8 @@
             }
         }
     } Catch {
-            Write-PscriboMessage -IsWarning $_.Exception.Message
-        }
+        Write-PScriboMessage -IsWarning $_.Exception.Message
+    }
 
     # Check if the required version of VMware PowerCLI is installed
     Get-RequiredModule -Name 'VMware.PowerCLI' -Version '12.7'
@@ -87,7 +93,7 @@
         Try {
             if ($PSVersionTable.PSEdition -eq 'Core') {
                 $AppVolServerRest = Invoke-RestMethod -SkipCertificateCheck -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds
-            } else {$AppVolServerRest = Invoke-RestMethod -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds}
+            } else { $AppVolServerRest = Invoke-RestMethod -SessionVariable SourceServerSession -Method Post -Uri "https://$AppVolServer/cv_api/sessions" -Body $AppVolRestCreds }
         } Catch {
             Write-Error $_
         }
@@ -96,10 +102,10 @@
         if ($AppVolServerRest.success -eq 'Ok') {
             # Generate report if connection to AppVolumes Manager General Information is successful
             if ($InfoLevel.AppVolumes.General -ge 1) {
-                section -Style Heading1 $($AppVolServer) {
+                Section -Style Heading1 $($AppVolServer) {
                     Paragraph "The following section provides a summary of the implemented components on the VMware App Volumes infrastructure."
                     Get-AbrAPPVolGeneral
-                    section -Style Heading2 "Inventory" {
+                    Section -Style Heading2 "Inventory" {
                         Get-AbrAPPVolApplication
                         Get-AbrAppVolPackage
                         Get-AbrAppVolProgram
@@ -107,23 +113,23 @@
                         Get-AbrAppVolWritable
                         #Get-AbrAppVolAppstack
                     }
-                    section -Style Heading2 "Directory" {
+                    Section -Style Heading2 "Directory" {
                         Get-AbrAppVolADUser
                         Get-AbrAppVolComputer
                         Get-AbrAppVolADGroup
                         Get-AbrAppVolADOU
                     }
-                    section -Style Heading2 "Infrastructure" {
+                    Section -Style Heading2 "Infrastructure" {
                         Get-AbrAppVolMachine
                         Get-AbrAppVolStorage
                         Get-AbrAppVolStorageGroup
                         Get-AbrAppVolInstance
                     }
-                    section -Style Heading2 "Activity" {
+                    Section -Style Heading2 "Activity" {
                         Get-AbrAppVolJob
                         Get-AbrAppVolTSArchive
                     }
-                    section -Style Heading2 "Configuration" {
+                    Section -Style Heading2 "Configuration" {
                         Get-AbrAppVolLicense
                         Get-AbrAppVolADDomain
                         Get-AbrAppVolAdminRole

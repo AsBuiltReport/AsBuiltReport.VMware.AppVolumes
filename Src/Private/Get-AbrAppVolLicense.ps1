@@ -5,7 +5,7 @@ function Get-AbrAPPVolLicense {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAPPVolLicense {
 
     begin {
         Write-PScriboMessage "License InfoLevel set at $($InfoLevel.AppVolumes.License)."
-        Write-PscriboMessage "Collecting License information."
+        Write-PScriboMessage "Collecting License information."
     }
 
     process {
@@ -31,18 +31,17 @@ function Get-AbrAPPVolLicense {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $License = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license"
-                } else {$License = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license"}
+                } else { $License = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/license" }
 
                 if ($License) {
                     $OutObj = @()
-                    section -Style Heading3 "License Information" {
+                    Section -Style Heading3 "License Information" {
                         Paragraph "The following section details license information for $($AppVolServer.split('.')[0])."
                         BlankLine
 
-                        Switch ($License.license.invalid)
-                        {
-                            'True' {$LicenseInvalid = 'False' }
-                            'False' {$LicenseInvalid = 'True' }
+                        Switch ($License.license.invalid) {
+                            'True' { $LicenseInvalid = 'False' }
+                            'False' { $LicenseInvalid = 'True' }
                         }
                         $inObj = [ordered] @{
                             'Key Create Date' = $License.license.Keycreate
@@ -85,9 +84,8 @@ function Get-AbrAPPVolLicense {
                         $OutObj | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

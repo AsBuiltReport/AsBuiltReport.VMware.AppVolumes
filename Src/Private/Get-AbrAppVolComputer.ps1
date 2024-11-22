@@ -5,7 +5,7 @@ function Get-AbrAppVolComputer {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolComputer {
 
     begin {
         Write-PScriboMessage "Managed Computers InfoLevel set at $($InfoLevel.AppVolumes.Computers)."
-        Write-PscriboMessage "Collecting Managed Computers information."
+        Write-PScriboMessage "Collecting Managed Computers information."
     }
 
     process {
@@ -31,12 +31,12 @@ function Get-AbrAppVolComputer {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $Computers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/computers?deleted=hide&"
-                } else {$Computers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/computers?deleted=hide&"}
+                } else { $Computers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/computers?deleted=hide&" }
 
                 if ($Computers) {
-                    section -Style Heading3 "Managed Computers" {
+                    Section -Style Heading3 "Managed Computers" {
                         Paragraph "The following section provide a summary of computers with app volumes agent installed and registered to $($AppVolServer.split('.')[0])."
-                        Blankline
+                        BlankLine
                         $OutObj = @()
                         foreach ($Computer in $Computers) {
                             try {
@@ -52,9 +52,8 @@ function Get-AbrAppVolComputer {
                                     'Status' = $Computer.Status
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
 
@@ -66,12 +65,11 @@ function Get-AbrAppVolComputer {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj| Sort-Object -Property upn | Table @TableParams
+                        $OutObj | Sort-Object -Property upn | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

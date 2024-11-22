@@ -5,7 +5,7 @@ function Get-AbrAppVolADDomain {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolADDomain {
 
     begin {
         Write-PScriboMessage "ADDomains InfoLevel set at $($InfoLevel.AppVolumes.ADDomains)."
-        Write-PscriboMessage "Collecting Active Directory Domain information."
+        Write-PScriboMessage "Collecting Active Directory Domain information."
     }
 
     process {
@@ -31,23 +31,22 @@ function Get-AbrAppVolADDomain {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
-                } else {$LDAPDomains = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"}
+                } else { $LDAPDomains = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains" }
                 if ($LDAPDomains) {
-                    section -Style Heading3 "Active Directory Domain" {
+                    Section -Style Heading3 "Active Directory Domain" {
                         Paragraph "The following section details active directory doamins are used for authentication on $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
                         foreach ($LDAPDomain in $LDAPDomains.ldap_domains | Sort-Object -Property Domain) {
 
-                            If($LDAPDomain.ldaps -like 'True'){
+                            If ($LDAPDomain.ldaps -like 'True') {
                                 $Security = 'LADPS'
-                            }elseif($LDAPDomain.ldaps -like 'False' -and $LDAPDomain.ldap_tls -like 'False'){
+                            } elseif ($LDAPDomain.ldaps -like 'False' -and $LDAPDomain.ldap_tls -like 'False') {
                                 $Security = 'LADP'
-                            }
-                            elseif($LDAPDomain.ldap_tls -like 'True'){
+                            } elseif ($LDAPDomain.ldap_tls -like 'True') {
                                 $Security = 'LADPS over TLS'
                             }
-                            section -Style Heading4 "AD Domain Summary"  {
+                            Section -Style Heading4 "AD Domain Summary" {
                                 try {
                                     $inObj = [ordered] @{
                                         'Domain' = $LDAPDomain.domain
@@ -69,14 +68,13 @@ function Get-AbrAppVolADDomain {
                                         $TableParams['Caption'] = "- $($TableParams.Name)"
                                     }
                                     $OutObj | Table @TableParams
-                                }
-                                catch {
-                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                } catch {
+                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                 }
                                 if ($InfoLevel.AppVolumes.ADDomains -ge 2) {
                                     $OutObj = @()
                                     foreach ($LDAPDomain in $LDAPDomains.ldap_domains | Sort-Object -Property Domain) {
-                                        section -ExcludeFromTOC -Style NOTOCHeading5 "AD Domain Details - $($LDAPDomain.domain)" {
+                                        Section -ExcludeFromTOC -Style NOTOCHeading5 "AD Domain Details - $($LDAPDomain.domain)" {
                                             try {
                                                 $inObj = [ordered] @{
                                                     'Username' = $LDAPDomain.username
@@ -88,9 +86,8 @@ function Get-AbrAppVolADDomain {
                                                     'Port' = $LDAPDomain.effective_port
                                                     'Created At' = $LDAPDomain.created_at
                                                     'Updated At' = $LDAPDomain.updated_at
-                                                            }
+                                                }
                                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-
 
                                                 $TableParams = @{
                                                     Name = "AD Domain Details - $($LDAPDomain.domain)"
@@ -101,9 +98,8 @@ function Get-AbrAppVolADDomain {
                                                     $TableParams['Caption'] = "- $($TableParams.Name)"
                                                 }
                                                 $OutObj | Table @TableParams
-                                            }
-                                            catch {
-                                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                                            } catch {
+                                                Write-PScriboMessage -IsWarning $_.Exception.Message
                                             }
                                         }
                                     }
@@ -114,9 +110,8 @@ function Get-AbrAppVolADDomain {
                         }
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }
