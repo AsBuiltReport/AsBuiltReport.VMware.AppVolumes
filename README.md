@@ -39,8 +39,6 @@ Please refer to the AsBuiltReport [website](https://www.asbuiltreport.com) for m
 
 Sample VMware AppVolumes As Built report HTML file: [Sample VMware AppVolumes As Built Report.html](https://htmlpreview.github.io/?https://raw.githubusercontent.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/dev/Samples/Sample%20VMware%20AppVolumes%20As%20Built%20Report.html)
 
-Sample VMware AppVolumes As Built report PDF file: [Sample VMware AppVolumes As Built Report.pdf](https://raw.githubusercontent.com/AsBuiltReport/AsBuiltReport.VMware.AppVolumes/dev/Samples/Sample%20VMware%20AppVolumes%20As%20Built%20Report.pdf)
-
 # :beginner: Getting Started
 Below are the instructions on how to install, configure and generate a VMware AppVolumes As Built report.
 
@@ -49,14 +47,14 @@ Below are the instructions on how to install, configure and generate a VMware Ap
 The VMware AppVolumes As Built Report supports the following AppVolumes versions;
 
 - Should work on version 4.+
-- Has been tested on all 230# Builds
+- Has been tested on all new Builds
 
 ### PowerShell
 This report is compatible with the following PowerShell versions;
 
 <!-- ********** Update supported PowerShell versions ********** -->
-| Windows PowerShell 5.1 |     PowerShell 7    |
-|:----------------------:|:--------------------:|
+| Windows PowerShell 5.1 |    PowerShell 7    |
+| :--------------------: | :----------------: |
 |   :white_check_mark:   | :white_check_mark: |
 ## :wrench: System Requirements
 <!-- ********** Update system requirements ********** -->
@@ -110,15 +108,15 @@ The following provides information of how to configure each schema within the re
 ### Report
 The **Report** schema provides configuration of the VMware AppVolumes report information.
 
-| Sub-Schema          | Setting      | Default                        | Description                                                  |
-|---------------------|--------------|--------------------------------|--------------------------------------------------------------|
+| Sub-Schema          | Setting      | Default                           | Description                                                  |
+| ------------------- | ------------ | --------------------------------- | ------------------------------------------------------------ |
 | Name                | User defined | VMware AppVolumes As Built Report | The name of the As Built Report                              |
-| Version             | User defined | 1.0                            | The report version                                           |
-| Status              | User defined | Released                       | The report release status                                    |
-| ShowCoverPageImage  | true / false | true                           | Toggle to enable/disable the display of the cover page image |
-| ShowTableOfContents | true / false | true                           | Toggle to enable/disable table of contents                   |
-| ShowHeaderFooter    | true / false | true                           | Toggle to enable/disable document headers & footers          |
-| ShowTableCaptions   | true / false | true                           | Toggle to enable/disable table captions/numbering            |
+| Version             | User defined | 1.0                               | The report version                                           |
+| Status              | User defined | Released                          | The report release status                                    |
+| ShowCoverPageImage  | true / false | true                              | Toggle to enable/disable the display of the cover page image |
+| ShowTableOfContents | true / false | true                              | Toggle to enable/disable table of contents                   |
+| ShowHeaderFooter    | true / false | true                              | Toggle to enable/disable document headers & footers          |
+| ShowTableCaptions   | true / false | true                              | Toggle to enable/disable table captions/numbering            |
 
 ### Options
 The **Options** schema allows certain options within the report to be toggled on or off.
@@ -129,39 +127,39 @@ The **InfoLevel** schema allows configuration of each section of the report at a
 
 There are 3 levels (0-2) of detail granularity for each section as follows;
 
-| Setting | InfoLevel         | Description                                                                                                                                |
-|:-------:|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-|    0    | Disabled          | Does not collect or display any information                                                                                                |
-|    1    | Enabled / Summary | Provides summarised information for a collection of objects                                                                                |
-|    2    | Adv Summary       | Provides condensed, detailed information for a collection of objects                                                                       |
+| Setting | InfoLevel         | Description                                                          |
+| :-----: | ----------------- | -------------------------------------------------------------------- |
+|    0    | Disabled          | Does not collect or display any information                          |
+|    1    | Enabled / Summary | Provides summarised information for a collection of objects          |
+|    2    | Adv Summary       | Provides condensed, detailed information for a collection of objects |
 
 The table below outlines the default and maximum InfoLevel settings for each section.
 
-| Sub-Schema   | Default Setting | Maximum Setting |
-|--------------|:---------------:|:---------------:|
-General | 1 | 1 |
-Application | 1 | 2 |
-Package | 1 | 2 |
-Program | 1 | 2 |
-Assignment | 1 | 2 |
-Writeables | 1 | 2 |
-ADUsers | 1 | 1 |
-Computers | 1 | 1 |
-ADGroups | 1 | 1 |
-ADOUs | 1 | 1 |
-Machines | 1 | 1 |
-StorageLocations | 1 | 2 |
-StorageGroups | 1 | 1 |
-Instance | 1 | 2 |
-Jobs | 1 | 1 |
-Troubleshooting | 1 | 1 |
-License | 1 | 1 |
-ADDomains | 1 | 2 |
-AdminGroups | 1 | 2 |
-MachineManagers | 1 | 2 |
-Storage | 1 | 1 |
-Managers | 1 | 1 |
-Settings | 1 | 1 |
+| Sub-Schema       | Default Setting | Maximum Setting |
+| ---------------- | :-------------: | :-------------: |
+| General          |        1        |        1        |
+| Application      |        1        |        2        |
+| Package          |        1        |        2        |
+| Program          |        1        |        2        |
+| Assignment       |        1        |        2        |
+| Writeables       |        1        |        2        |
+| ADUsers          |        1        |        1        |
+| Computers        |        1        |        1        |
+| ADGroups         |        1        |        1        |
+| ADOUs            |        1        |        1        |
+| Machines         |        1        |        1        |
+| StorageLocations |        1        |        2        |
+| StorageGroups    |        1        |        1        |
+| Instance         |        1        |        2        |
+| Jobs             |        1        |        1        |
+| Troubleshooting  |        1        |        1        |
+| License          |        1        |        1        |
+| ADDomains        |        1        |        2        |
+| AdminGroups      |        1        |        2        |
+| MachineManagers  |        1        |        2        |
+| Storage          |        1        |        1        |
+| Managers         |        1        |        1        |
+| Settings         |        1        |        1        |
 
 
 ### Healthcheck

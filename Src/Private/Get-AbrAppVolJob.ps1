@@ -5,7 +5,7 @@ function Get-AbrAppVolJob {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolJob {
 
     begin {
         Write-PScriboMessage "Jobs InfoLevel set at $($InfoLevel.AppVolumes.Jobs)."
-        Write-PscriboMessage "Collecting Job information."
+        Write-PScriboMessage "Collecting Job information."
     }
 
     process {
@@ -31,10 +31,10 @@ function Get-AbrAppVolJob {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $Jobs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/jobs"
-                } else {$Jobs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/jobs"}
+                } else { $Jobs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/jobs" }
 
                 if ($Jobs) {
-                    section -Style Heading3 "Scheduled Jobs" {
+                    Section -Style Heading3 "Scheduled Jobs" {
                         Paragraph "The following section provide a summary of scheduled jobs for $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
@@ -47,9 +47,8 @@ function Get-AbrAppVolJob {
                                     'Last Run At' = $Job.last_run_at
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
 
@@ -61,12 +60,11 @@ function Get-AbrAppVolJob {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj| Sort-Object -Property Name | Table @TableParams
+                        $OutObj | Sort-Object -Property Name | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

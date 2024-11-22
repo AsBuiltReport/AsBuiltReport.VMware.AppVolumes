@@ -5,7 +5,7 @@ function Get-AbrAppVolTSArchive {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolTSArchive {
 
     begin {
         Write-PScriboMessage "Troubleshooting Archive InfoLevel set at $($InfoLevel.AppVolumes.Troubleshooting)."
-        Write-PscriboMessage "Troubleshooting Archive information."
+        Write-PScriboMessage "Troubleshooting Archive information."
     }
 
     process {
@@ -31,10 +31,10 @@ function Get-AbrAppVolTSArchive {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $TSAs = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/troubleshooting_archive?"
-                } else {$TSAs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/troubleshooting_archive?"}
+                } else { $TSAs = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/troubleshooting_archive?" }
 
                 if ($TSAs.trblarchive.data) {
-                    section -Style Heading3 "Troubleshooting Archives" {
+                    Section -Style Heading3 "Troubleshooting Archives" {
                         Paragraph "The following section provide a summary of troubleshooting archives for $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
@@ -46,9 +46,8 @@ function Get-AbrAppVolTSArchive {
                                     'Size' = $TSA.Size
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
 
@@ -60,12 +59,11 @@ function Get-AbrAppVolTSArchive {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj| Sort-Object -Property Name | Table @TableParams
+                        $OutObj | Sort-Object -Property Name | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

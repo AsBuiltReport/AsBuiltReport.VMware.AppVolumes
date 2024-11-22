@@ -5,7 +5,7 @@ function Get-AbrAppVolADGroup {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolADGroup {
 
     begin {
         Write-PScriboMessage "ADGroups InfoLevel set at $($InfoLevel.AppVolumes.ADGroups)."
-        Write-PscriboMessage "Collecting Active Directory Group information."
+        Write-PScriboMessage "Collecting Active Directory Group information."
     }
 
     process {
@@ -31,9 +31,9 @@ function Get-AbrAppVolADGroup {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $ActiveDirectoryGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"
-                } else {$ActiveDirectoryGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups"}
+                } else { $ActiveDirectoryGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/groups" }
                 if ($ActiveDirectoryGroups) {
-                    section -Style Heading3 "Managed Groups" {
+                    Section -Style Heading3 "Managed Groups" {
                         Paragraph "The following section provide a summary of Groups that have assignments on $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
@@ -43,13 +43,12 @@ function Get-AbrAppVolADGroup {
                                     'Group Name' = $ActiveDirectoryGroup.Name
                                     'Writable' = $ActiveDirectoryGroup.writables
                                     'Assignments' = $ActiveDirectoryGroup.application_assignment_count
-                                    'Last Logon' = $ActiveDirectoryGroup.last_login_human.split()[0,1,2] -join ' '
+                                    'Last Logon' = $ActiveDirectoryGroup.last_login_human.split()[0, 1, 2] -join ' '
                                     'Status' = $ActiveDirectoryGroup.status
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
 
@@ -64,9 +63,8 @@ function Get-AbrAppVolADGroup {
                         $OutObj | Sort-Object -Property Name | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

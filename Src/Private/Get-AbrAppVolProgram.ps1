@@ -5,7 +5,7 @@ function Get-AbrAppVolProgram {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolProgram {
 
     begin {
         Write-PScriboMessage "Programs InfoLevel set at $($InfoLevel.AppVolumes.Programs)."
-        Write-PscriboMessage "Collecting Programs information."
+        Write-PScriboMessage "Collecting Programs information."
     }
 
     process {
@@ -31,12 +31,12 @@ function Get-AbrAppVolProgram {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $ProgramsAll = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_programs"
-                } else {$ProgramsAll = Invoke-RestMethod -WebSession $SourceServerSession -Method get -Uri "https://$AppVolServer/app_volumes/app_programs"}
+                } else { $ProgramsAll = Invoke-RestMethod -WebSession $SourceServerSession -Method get -Uri "https://$AppVolServer/app_volumes/app_programs" }
 
                 if ($ProgramsAll) {
-                    section -Style Heading3 'Programs Summary' {
+                    Section -Style Heading3 'Programs Summary' {
                         Paragraph "The following section provide a summary of the programs on $($AppVolServer.split('.')[0])."
-                        Blankline
+                        BlankLine
                         $OutObj = @()
                         foreach ($PA in $ProgramsAll.data) {
                             try {
@@ -48,9 +48,8 @@ function Get-AbrAppVolProgram {
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
 
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
                         $TableParams = @{
@@ -63,11 +62,11 @@ function Get-AbrAppVolProgram {
                         }
                         $OutObj | Sort-Object -Property Name | Table @TableParams
                         if ($InfoLevel.AppVolumes.Programs -ge 2) {
-                            section -Style Heading4 "Program Details" {
+                            Section -Style Heading4 "Program Details" {
                                 foreach ($PA in $ProgramsAll.data | Sort-Object -Property Name) {
                                     try {
                                         if ($PA) {
-                                            section -Style Heading5 "Program Details - $($PA.Name)" {
+                                            Section -Style Heading5 "Program Details - $($PA.Name)" {
                                                 $OutObj = @()
                                                 $inObj = [ordered] @{
                                                     'Name' = $PA.Name
@@ -93,17 +92,16 @@ function Get-AbrAppVolProgram {
                                             }
 
                                         }
-                                    }catch {
-                                        Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    } catch {
+                                        Write-PScriboMessage -IsWarning $_.Exception.Message
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

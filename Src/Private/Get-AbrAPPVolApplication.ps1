@@ -5,7 +5,7 @@ function Get-AbrAPPVolApplication {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAPPVolApplication {
 
     begin {
         Write-PScriboMessage "Products InfoLevel set at $($InfoLevel.AppVolumes.Products)."
-        Write-PscriboMessage "Collecting Products information."
+        Write-PScriboMessage "Collecting Products information."
     }
 
     process {
@@ -31,12 +31,12 @@ function Get-AbrAPPVolApplication {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $Products = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products"
-                } else {$Products = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products"}
+                } else { $Products = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products" }
 
                 if ($Products.data) {
-                    section -Style Heading3 'Application Summary' {
+                    Section -Style Heading3 'Application Summary' {
                         Paragraph "The following section provide a summary of the applications captured on $($AppVolServer.split('.')[0])."
-                        Blankline
+                        BlankLine
                         $OutObj = @()
                         foreach ($Product in $Products.data) {
                             try {
@@ -44,9 +44,9 @@ function Get-AbrAPPVolApplication {
 
                                 if ($PSVersionTable.PSEdition -eq 'Core') {
                                     $ProductIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"
-                                } else {$ProductIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"}
+                                } else { $ProductIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers" }
 
-                                $ProductPackage =  $ProductIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
+                                $ProductPackage = $ProductIDSource.data | Where-Object { $_.app_markers.name -eq 'CURRENT' }
 
                                 $inObj = [ordered] @{
                                     'Name' = $Product.Name
@@ -58,9 +58,8 @@ function Get-AbrAPPVolApplication {
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
 
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
                         $TableParams = @{
@@ -73,34 +72,34 @@ function Get-AbrAPPVolApplication {
                         }
                         $OutObj | Sort-Object -Property Name | Table @TableParams
                         if ($InfoLevel.AppVolumes.Products -ge 2) {
-                            section -Style Heading4 "Applications Details" {
+                            Section -Style Heading4 "Applications Details" {
                                 foreach ($Product in $Products.data | Sort-Object -Property Name) {
                                     try {
                                         $ProductID = $Product.id
 
                                         if ($PSVersionTable.PSEdition -eq 'Core') {
                                             $ProductIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"
-                                        } else {$ProductIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers"}
+                                        } else { $ProductIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/app_packages?include=app_markers" }
 
                                         if ($PSVersionTable.PSEdition -eq 'Core') {
                                             $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
-                                        } else {$ActiveDirectoryUsers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"}
+                                        } else { $ActiveDirectoryUsers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users" }
 
                                         foreach ($ActiveDirectoryUser in $ActiveDirectoryUsers) {
-                                            if($ActiveDirectoryUser){
+                                            if ($ActiveDirectoryUser) {
                                                 if ($PSVersionTable.PSEdition -eq 'Core') {
                                                     $UserDetails = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users/$($ActiveDirectoryUser.id)"
-                                                } else {$UserDetails = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users/$($ActiveDirectoryUser.id)"}
-                                                if($UserDetails.object_guid -like $Product.Owner_Guid){
+                                                } else { $UserDetails = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users/$($ActiveDirectoryUser.id)" }
+                                                if ($UserDetails.object_guid -like $Product.Owner_Guid) {
                                                     $OwnerName = $UserDetails.upn
                                                     Break
                                                 }
                                             }
                                         }
 
-                                        $ProductPackage =  $ProductIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
+                                        $ProductPackage = $ProductIDSource.data | Where-Object { $_.app_markers.name -eq 'CURRENT' }
                                         if ($Product) {
-                                            section -Style Heading5 "Application Details - $($Product.Name)" {
+                                            Section -Style Heading5 "Application Details - $($Product.Name)" {
                                                 $OutObj = @()
                                                 $inObj = [ordered] @{
                                                     'Name' = $Product.Name
@@ -127,27 +126,27 @@ function Get-AbrAPPVolApplication {
                                                 }
                                                 $OutObj | Table @TableParams
                                                 try {
-                                                    $ProductPackages =  $ProductIDSource.data
+                                                    $ProductPackages = $ProductIDSource.data
                                                     if ($ProductPackage) {
-                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Application Packages" {
+                                                        Section -ExcludeFromTOC -Style NOTOCHeading6 "Application Packages" {
                                                             $OutObj = @()
                                                             foreach ($Package in $ProductPackages) {
                                                                 $inObj = [ordered] @{
                                                                     'Name' = $Package.Name
                                                                     'Version' = $Package.Version
                                                                     'Created' = Switch ($Package.created_at) {
-                                                                        $Null {'--'}
-                                                                        default {([DateTime]$Package.created_at).ToShortDateString()}
+                                                                        $Null { '--' }
+                                                                        default { ([DateTime]$Package.created_at).ToShortDateString() }
                                                                     }
                                                                     'Mounted' = Switch ($Package.mounted_at) {
-                                                                        $Null {'--'}
-                                                                        default {([DateTime]$Package.mounted_at).ToShortDateString()}
+                                                                        $Null { '--' }
+                                                                        default { ([DateTime]$Package.mounted_at).ToShortDateString() }
                                                                     }
                                                                     'Size' = $Package.size_human
                                                                     'Current' = Switch ($Package.app_markers.name) {
-                                                                        $null {'No'}
-                                                                        'CURRENT' {'Yes'}
-                                                                        default {'--'}
+                                                                        $null { 'No' }
+                                                                        'CURRENT' { 'Yes' }
+                                                                        default { '--' }
                                                                     }
                                                                 }
                                                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
@@ -163,14 +162,14 @@ function Get-AbrAPPVolApplication {
                                                             }
                                                             $OutObj | Sort-Object -Property 'Version' -Descending | Table @TableParams
                                                             try {
-                                                                $ProductPackage =  ($ProductIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}).id
+                                                                $ProductPackage = ($ProductIDSource.data | Where-Object { $_.app_markers.name -eq 'CURRENT' }).id
 
                                                                 if ($PSVersionTable.PSEdition -eq 'Core') {
                                                                     $ProductPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_packages/$ProductPackage/programs"
-                                                                } else {$ProductPrograms = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_packages/$ProductPackage/programs"}
+                                                                } else { $ProductPrograms = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_packages/$ProductPackage/programs" }
 
                                                                 if ($ProductPrograms.data) {
-                                                                    section -ExcludeFromTOC -Style NOTOCHeading6 "Application Programs" {
+                                                                    Section -ExcludeFromTOC -Style NOTOCHeading6 "Application Programs" {
                                                                         $OutObj = @()
                                                                         foreach ($Program in $ProductPrograms.data) {
                                                                             $inObj = [ordered] @{
@@ -193,22 +192,22 @@ function Get-AbrAPPVolApplication {
                                                                     }
                                                                 }
                                                             } catch {
-                                                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                                Write-PScriboMessage -IsWarning $_.Exception.Message
                                                             }
                                                         }
                                                     }
                                                 } catch {
-                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                                 }
                                                 try {
                                                     $ProductID = $Product.id
 
                                                     if ($PSVersionTable.PSEdition -eq 'Core') {
                                                         $ProductAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/assignments?include=entities"
-                                                    } else {$ProductAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/assignments?include=entities"}
+                                                    } else { $ProductAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -ContentType 'application/json' -Uri "https://$AppVolServer/app_volumes/app_products/$ProductID/assignments?include=entities" }
 
                                                     if ($ProductAssignments.data) {
-                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Application Assignment" {
+                                                        Section -ExcludeFromTOC -Style NOTOCHeading6 "Application Assignment" {
                                                             $OutObj = @()
                                                             foreach ($ProductAssignment in $ProductAssignments.data) {
                                                                 try {
@@ -217,9 +216,8 @@ function Get-AbrAPPVolApplication {
                                                                         'Type' = $ProductAssignment.entities.entity_type
                                                                     }
                                                                     $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                                                                }
-                                                                catch {
-                                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                                } catch {
+                                                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                                                 }
                                                             }
 
@@ -234,22 +232,21 @@ function Get-AbrAPPVolApplication {
                                                             $OutObj | Sort-Object -Property 'Name' |  Table @TableParams
                                                         }
                                                     }
-                                                }  catch {
-                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                } catch {
+                                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                                 }
                                             }
                                         }
-                                    }catch {
-                                        Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    } catch {
+                                        Write-PScriboMessage -IsWarning $_.Exception.Message
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

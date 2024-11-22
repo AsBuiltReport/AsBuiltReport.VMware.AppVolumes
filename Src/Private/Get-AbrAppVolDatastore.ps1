@@ -5,7 +5,7 @@ function Get-AbrAppVolDatastore {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolDatastore {
 
     begin {
         Write-PScriboMessage "Storage InfoLevel set at $($InfoLevel.AppVolumes.Storage)."
-        Write-PscriboMessage "Collecting Active Directory Datastore information."
+        Write-PScriboMessage "Collecting Active Directory Datastore information."
     }
 
     process {
@@ -31,30 +31,29 @@ function Get-AbrAppVolDatastore {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $Datastores = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"
-                } else {$Datastores = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores"}
+                } else { $Datastores = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/datastores" }
 
                 if ($Datastores) {
-                    section -Style Heading3 "Storage Overview" {
+                    Section -Style Heading3 "Storage Overview" {
                         Paragraph "The following section details off location of templates for $($AppVolServer.split('.')[0])."
                         BlankLine
                         foreach ($DatastoreD in $Datastores.datastores) {
                             try {
-                                if($DatastoreD.uniq_string -eq $Datastores.data_disk_storage){
+                                if ($DatastoreD.uniq_string -eq $Datastores.data_disk_storage) {
                                     $DatastoreWritableStorage = $DatastoreD.name
                                 }
-                                if($DatastoreD.uniq_string -eq $Datastores.package_storage){
+                                if ($DatastoreD.uniq_string -eq $Datastores.package_storage) {
                                     $DatastoreAppStorage = $DatastoreD.name
                                 }
-                                if($DatastoreD.uniq_string -eq $Datastores.data_disk_backup_recurrent_path){
+                                if ($DatastoreD.uniq_string -eq $Datastores.data_disk_backup_recurrent_path) {
                                     $DatastoreAWriteableBackupRecurrentDatastore = $DatastoreD.name
                                 }
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
                         try {
-                            section -Style Heading4 "Storage Overview Packages" {
+                            Section -Style Heading4 "Storage Overview Packages" {
                                 $OutObj = @()
                                 $inObj = [ordered] @{
                                     'Default Storage Location' = "[$($Datastores.Datacenter)] $DatastoreAppStorage"
@@ -73,12 +72,11 @@ function Get-AbrAppVolDatastore {
                                 }
                                 $OutObj | Table @TableParams
                             }
-                        }
-                        catch {
-                            Write-PscriboMessage -IsWarning $_.Exception.Message
+                        } catch {
+                            Write-PScriboMessage -IsWarning $_.Exception.Message
                         }
                         try {
-                            section -Style Heading4 "Storage Overview Writable Volumes" {
+                            Section -Style Heading4 "Storage Overview Writable Volumes" {
                                 $OutObj = @()
                                 $inObj = [ordered] @{
                                     'Default Storage Location' = "[$($Datastores.Datacenter)] $DatastoreWritableStorage"
@@ -99,15 +97,13 @@ function Get-AbrAppVolDatastore {
                                 }
                                 $OutObj | Table @TableParams
                             }
-                        }
-                        catch {
-                            Write-PscriboMessage -IsWarning $_.Exception.Message
+                        } catch {
+                            Write-PScriboMessage -IsWarning $_.Exception.Message
                         }
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }
