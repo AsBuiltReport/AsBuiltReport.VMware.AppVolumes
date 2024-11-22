@@ -5,7 +5,7 @@ function Get-AbrAppVolMachine {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolMachine {
 
     begin {
         Write-PScriboMessage "Managed Machines InfoLevel set at $($InfoLevel.AppVolumes.Machines)."
-        Write-PscriboMessage "Collecting Managed Machines information."
+        Write-PScriboMessage "Collecting Managed Machines information."
     }
 
     process {
@@ -31,14 +31,14 @@ function Get-AbrAppVolMachine {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $Machines = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machines"
-                } else {$Machines = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machines"}
+                } else { $Machines = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machines" }
 
                 if ($Machines) {
-                    section -Style Heading3 "Managed Machines Summary" {
+                    Section -Style Heading3 "Managed Machines Summary" {
                         Paragraph "The following section provide a summary of managed machines on $($AppVolServer.split('.')[0])."
                         BlankLine
                         $OutObj = @()
-                        foreach ($Machines in ($Machines.machines | Where-Object {$_.Status -notlike 'Absent'})) {
+                        foreach ($Machines in ($Machines.machines | Where-Object { $_.Status -notlike 'Absent' })) {
                             try {
                                 $inObj = [ordered] @{
                                     'Name' = $Machines.name
@@ -48,9 +48,8 @@ function Get-AbrAppVolMachine {
                                     'Status' = $Machines.Status
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
 
@@ -62,12 +61,11 @@ function Get-AbrAppVolMachine {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj| Sort-Object -Property Name | Table @TableParams
+                        $OutObj | Sort-Object -Property Name | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

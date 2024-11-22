@@ -5,7 +5,7 @@ function Get-AbrAppVolADUser {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolADUser {
 
     begin {
         Write-PScriboMessage "ADUsers InfoLevel set at $($InfoLevel.AppVolumes.ADUsers)."
-        Write-PscriboMessage "Collecting Active Directory User information."
+        Write-PScriboMessage "Collecting Active Directory User information."
     }
 
     process {
@@ -31,18 +31,18 @@ function Get-AbrAppVolADUser {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $ActiveDirectoryUsers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"
-                } else {$ActiveDirectoryUsers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users"}
+                } else { $ActiveDirectoryUsers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/users" }
 
                 if ($ActiveDirectoryUsers) {
-                    section -Style Heading3 "Managed Users" {
+                    Section -Style Heading3 "Managed Users" {
                         Paragraph "The following section provide a summary of Users who have logged-in to a managed computer or have assignments on $($AppVolServer.split('.')[0])."
-                        Blankline
+                        BlankLine
                         $OutObj = @()
                         foreach ($ActiveDirectoryUser in $ActiveDirectoryUsers) {
                             if ($ActiveDirectoryUser) {
-                                if($ActiveDirectoryUser.last_login_human){
-                                    $LastLogonUser = $ActiveDirectoryUser.last_login_human.split()[0,1,2] -join ' '
-                                }else{
+                                if ($ActiveDirectoryUser.last_login_human) {
+                                    $LastLogonUser = $ActiveDirectoryUser.last_login_human.split()[0, 1, 2] -join ' '
+                                } else {
                                     $LastLogonUser = "Never"
                                 }
                                 try {
@@ -56,9 +56,8 @@ function Get-AbrAppVolADUser {
                                         'Status' = $ActiveDirectoryUser.status
                                     }
                                     $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                                }
-                                catch {
-                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                } catch {
+                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                 }
                             }
                         }
@@ -71,12 +70,11 @@ function Get-AbrAppVolADUser {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj| Sort-Object -Property upn | Table @TableParams
+                        $OutObj | Sort-Object -Property upn | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

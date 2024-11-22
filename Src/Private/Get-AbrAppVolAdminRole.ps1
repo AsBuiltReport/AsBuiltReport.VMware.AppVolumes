@@ -5,7 +5,7 @@ function Get-AbrAppVolAdminRole {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolAdminRole {
 
     begin {
         Write-PScriboMessage "AdminGroups InfoLevel set at $($InfoLevel.AppVolumes.AdminGroups)."
-        Write-PscriboMessage "Collecting Administrator Roles information."
+        Write-PScriboMessage "Collecting Administrator Roles information."
     }
 
     process {
@@ -31,10 +31,10 @@ function Get-AbrAppVolAdminRole {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $AdminGroups = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"
-                } else {$AdminGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions"}
+                } else { $AdminGroups = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/group_permissions" }
 
                 if ($AdminGroups) {
-                    section -Style Heading3 "Administrator Roles" {
+                    Section -Style Heading3 "Administrator Roles" {
                         Paragraph "The following section details administrative rolls for $($AppVolServer.split('.')[0])."
                         BlankLine
 
@@ -48,9 +48,8 @@ function Get-AbrAppVolAdminRole {
                                     'Created at' = ([DateTime]$AdminGroup.created_at).ToShortDateString()
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
 
@@ -62,12 +61,11 @@ function Get-AbrAppVolAdminRole {
                         if ($Report.ShowTableCaptions) {
                             $TableParams['Caption'] = "- $($TableParams.Name)"
                         }
-                        $OutObj| Sort-Object -Property assignee_upn | Table @TableParams
+                        $OutObj | Sort-Object -Property assignee_upn | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

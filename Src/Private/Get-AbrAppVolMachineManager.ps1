@@ -5,7 +5,7 @@ function Get-AbrAppVolMachineManager {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolMachineManager {
 
     begin {
         Write-PScriboMessage "MachineManagers InfoLevel set at $($InfoLevel.AppVolumes.MachineManagers)."
-        Write-PscriboMessage "Collecting Machine Managers information."
+        Write-PScriboMessage "Collecting Machine Managers information."
     }
 
     process {
@@ -31,13 +31,13 @@ function Get-AbrAppVolMachineManager {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
-                } else {$MachineManagers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"}
+                } else { $MachineManagers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers" }
 
                 if ($MachineManagers) {
-                    section -Style Heading3 "Machine Managers" {
+                    Section -Style Heading3 "Machine Managers" {
                         Paragraph "The following section provide a summary of machine managers for $($AppVolServer.split('.')[0])."
                         BlankLine
-                        section -Style Heading4 "Machine Manager Summary" {
+                        Section -Style Heading4 "Machine Manager Summary" {
                             $OutObj = @()
                             foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
                                 try {
@@ -47,9 +47,8 @@ function Get-AbrAppVolMachineManager {
                                         'Type' = $MachineManager.type
                                     }
                                     $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                                }
-                                catch {
-                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                } catch {
+                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                 }
                             }
 
@@ -67,12 +66,12 @@ function Get-AbrAppVolMachineManager {
                         if ($InfoLevel.AppVolumes.MachineManagers -ge 2) {
                             $OutObj = @()
                             foreach ($MachineManager in $MachineManagers.machine_managers | Sort-Object -Property Host) {
-                                section -ExcludeFromTOC -Style NOTOCHeading5 "Machine Manager Details - $($MachineManager.host)" {
+                                Section -ExcludeFromTOC -Style NOTOCHeading5 "Machine Manager Details - $($MachineManager.host)" {
 
                                     if ($PSVersionTable.PSEdition -eq 'Core') {
                                         $MachineManagerDetail = (Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers/$($MachineManager.id)").machine_manager
-                                    } else {$MachineManagerDetail = (Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers/$($MachineManager.id)").machine_manager}
-                                        try {
+                                    } else { $MachineManagerDetail = (Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers/$($MachineManager.id)").machine_manager }
+                                    try {
                                         $inObj = [ordered] @{
                                             'Type' = $MachineManagerDetail.type
                                             'Host Name' = $MachineManagerDetail.host
@@ -99,9 +98,8 @@ function Get-AbrAppVolMachineManager {
                                             $TableParams['Caption'] = "- $($TableParams.Name)"
                                         }
                                         $OutObj | Table @TableParams
-                                    }
-                                    catch {
-                                        Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    } catch {
+                                        Write-PScriboMessage -IsWarning $_.Exception.Message
                                     }
                                 }
                             }
@@ -151,9 +149,8 @@ function Get-AbrAppVolMachineManager {
 
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

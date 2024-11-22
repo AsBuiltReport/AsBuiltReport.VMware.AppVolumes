@@ -5,7 +5,7 @@ function Get-AbrAPPVolGeneral {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAPPVolGeneral {
 
     begin {
         Write-PScriboMessage "General InfoLevel set at $($InfoLevel.AppVolumes.General)."
-        Write-PscriboMessage "Collecting General APPVolume information."
+        Write-PScriboMessage "Collecting General APPVolume information."
     }
 
     process {
@@ -31,22 +31,22 @@ function Get-AbrAPPVolGeneral {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $GeneralAppInfo = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"
-                } else {$GeneralAppInfo = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version"}
+                } else { $GeneralAppInfo = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/version" }
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $LDAPDomains = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"
-                } else {$LDAPDomains = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains"}
+                } else { $LDAPDomains = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/ldap_domains" }
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $Managers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"
-                } else {$Managers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services"}
+                } else { $Managers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/manager_services" }
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $MachineManagers = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"
-                } else {$MachineManagers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers"}
+                } else { $MachineManagers = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/cv_api/machine_managers" }
 
                 if ($GeneralAppInfo -and $LDAPDomains -and $Managers) {
                     $OutObj = @()
-                    section -Style Heading2 "General Information" {
+                    Section -Style Heading2 "General Information" {
                         Paragraph "The following section provide a summary of common information on $($AppVolServer.split('.')[0])."
-                        Blankline
+                        BlankLine
                         $inObj = [ordered] @{
                             'Name' = $AppVolServer
                             'Version' = $GeneralAppInfo.version
@@ -69,9 +69,8 @@ function Get-AbrAPPVolGeneral {
                         $OutObj | Table @TableParams
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

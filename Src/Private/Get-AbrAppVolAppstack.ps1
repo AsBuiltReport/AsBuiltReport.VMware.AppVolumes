@@ -5,7 +5,7 @@ function Get-AbrAPPVolAppstack {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAPPVolAppstack {
 
     begin {
         Write-PScriboMessage "AppStacks InfoLevel set at $($InfoLevel.AppVolumes.AppStacks)."
-        Write-PscriboMessage "Collecting AppStacks information."
+        Write-PScriboMessage "Collecting AppStacks information."
     }
 
     process {
@@ -31,12 +31,12 @@ function Get-AbrAPPVolAppstack {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $AppStacks = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products"
-                } else {$AppStacks = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products"}
+                } else { $AppStacks = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products" }
 
                 if ($AppStacks) {
-                    section -Style Heading3 'AppStacks Summary' {
+                    Section -Style Heading3 'AppStacks Summary' {
                         Paragraph "The following section provide a summary of the AppStacks components on $($AppVolServer.split('.')[0])."
-                        Blankline
+                        BlankLine
                         $OutObj = @()
                         foreach ($AppStack in $AppStacks.data) {
                             try {
@@ -44,9 +44,9 @@ function Get-AbrAPPVolAppstack {
 
                                 if ($PSVersionTable.PSEdition -eq 'Core') {
                                     $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
-                                } else {$AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"}
+                                } else { $AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers" }
 
-                                $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
+                                $AppStackPackage = $AppStackIDSource.data | Where-Object { $_.app_markers.name -eq 'CURRENT' }
 
                                 $inObj = [ordered] @{
                                     'Name' = $AppStack.Name
@@ -58,9 +58,8 @@ function Get-AbrAPPVolAppstack {
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
 
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
                         $TableParams = @{
@@ -73,20 +72,20 @@ function Get-AbrAPPVolAppstack {
                         }
                         $OutObj | Sort-Object -Property Name | Table @TableParams
                         if ($InfoLevel.AppVolumes.AppStacks -ge 2) {
-                            section -Style Heading4 "AppStacks Details" {
+                            Section -Style Heading4 "AppStacks Details" {
                                 Paragraph "The following section details AppStacks configuration information on $($AppVolServer.split('.')[0])."
-                                Blankline
+                                BlankLine
                                 foreach ($AppStack in $AppStacks.data | Sort-Object -Property Name) {
                                     try {
                                         $AppStackID = $appstack.id
 
                                         if ($PSVersionTable.PSEdition -eq 'Core') {
                                             $AppStackIDSource = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"
-                                        } else {$AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers"}
+                                        } else { $AppStackIDSource = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/app_packages?include=app_markers" }
 
-                                        $AppStackPackage =  $AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}
+                                        $AppStackPackage = $AppStackIDSource.data | Where-Object { $_.app_markers.name -eq 'CURRENT' }
                                         if ($AppStackPackage) {
-                                            section -Style Heading5 "$($AppStack.Name)" {
+                                            Section -Style Heading5 "$($AppStack.Name)" {
                                                 $OutObj = @()
                                                 $inObj = [ordered] @{
                                                     'Name' = $AppStack.Name
@@ -118,27 +117,27 @@ function Get-AbrAPPVolAppstack {
                                                 }
                                                 $OutObj | Table @TableParams
                                                 try {
-                                                    $AppStackPackages =  $AppStackIDSource.data
+                                                    $AppStackPackages = $AppStackIDSource.data
                                                     if ($AppStackPackage) {
-                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Packages" {
+                                                        Section -ExcludeFromTOC -Style NOTOCHeading6 "Packages" {
                                                             $OutObj = @()
                                                             foreach ($Package in $AppStackPackages) {
                                                                 $inObj = [ordered] @{
                                                                     'Name' = $Package.Name
                                                                     'Version' = $Package.Version
                                                                     'Created' = Switch ($Package.created_at) {
-                                                                        $Null {'--'}
-                                                                        default {([DateTime]$Package.created_at).ToShortDateString()}
+                                                                        $Null { '--' }
+                                                                        default { ([DateTime]$Package.created_at).ToShortDateString() }
                                                                     }
                                                                     'Mounted' = Switch ($Package.mounted_at) {
-                                                                        $Null {'--'}
-                                                                        default {([DateTime]$Package.mounted_at).ToShortDateString()}
+                                                                        $Null { '--' }
+                                                                        default { ([DateTime]$Package.mounted_at).ToShortDateString() }
                                                                     }
                                                                     'Size' = $Package.size_human
                                                                     'Current' = Switch ($Package.app_markers.name) {
-                                                                        $null {'No'}
-                                                                        'CURRENT' {'Yes'}
-                                                                        default {'--'}
+                                                                        $null { 'No' }
+                                                                        'CURRENT' { 'Yes' }
+                                                                        default { '--' }
                                                                     }
                                                                 }
                                                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
@@ -154,14 +153,14 @@ function Get-AbrAPPVolAppstack {
                                                             }
                                                             $OutObj | Sort-Object -Property 'Version' -Descending | Table @TableParams
                                                             try {
-                                                                $AppStackPackage =  ($AppStackIDSource.data | Where-Object {$_.app_markers.name -eq 'CURRENT'}).id
+                                                                $AppStackPackage = ($AppStackIDSource.data | Where-Object { $_.app_markers.name -eq 'CURRENT' }).id
 
                                                                 if ($PSVersionTable.PSEdition -eq 'Core') {
                                                                     $AppStackPrograms = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"
-                                                                } else {$AppStackPrograms = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs"}
+                                                                } else { $AppStackPrograms = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_packages/$AppStackPackage/programs" }
 
                                                                 if ($AppStackPrograms) {
-                                                                    section -ExcludeFromTOC -Style NOTOCHeading6 "Programs" {
+                                                                    Section -ExcludeFromTOC -Style NOTOCHeading6 "Programs" {
                                                                         $OutObj = @()
                                                                         foreach ($Program in $AppStackPrograms.data) {
                                                                             $inObj = [ordered] @{
@@ -184,22 +183,22 @@ function Get-AbrAPPVolAppstack {
                                                                     }
                                                                 }
                                                             } catch {
-                                                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                                Write-PScriboMessage -IsWarning $_.Exception.Message
                                                             }
                                                         }
                                                     }
                                                 } catch {
-                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                                 }
                                                 try {
                                                     $AppStackID = $appstack.id
 
                                                     if ($PSVersionTable.PSEdition -eq 'Core') {
                                                         $AppStackAssignments = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"
-                                                    } else {$AppStackAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities"}
+                                                    } else { $AppStackAssignments = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/app_products/$AppStackID/assignments?include=entities" }
 
                                                     if ($AppStackAssignments) {
-                                                        section -ExcludeFromTOC -Style NOTOCHeading6 "Assignment" {
+                                                        Section -ExcludeFromTOC -Style NOTOCHeading6 "Assignment" {
                                                             $OutObj = @()
                                                             foreach ($AppStackAssignment in $AppStackAssignments.data) {
                                                                 try {
@@ -208,9 +207,8 @@ function Get-AbrAPPVolAppstack {
                                                                         'Type' = $AppStackAssignment.entities.entity_type
                                                                     }
                                                                     $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                                                                }
-                                                                catch {
-                                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                                } catch {
+                                                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                                                 }
                                                             }
 
@@ -225,22 +223,21 @@ function Get-AbrAPPVolAppstack {
                                                             $OutObj | Sort-Object -Property 'Name' |  Table @TableParams
                                                         }
                                                     }
-                                                }  catch {
-                                                    Write-PscriboMessage -IsWarning $_.Exception.Message
+                                                } catch {
+                                                    Write-PScriboMessage -IsWarning $_.Exception.Message
                                                 }
                                             }
                                         }
-                                    }catch {
-                                        Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    } catch {
+                                        Write-PScriboMessage -IsWarning $_.Exception.Message
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

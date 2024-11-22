@@ -5,7 +5,7 @@ function Get-AbrAppVolSetting {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolSetting {
 
     begin {
         Write-PScriboMessage "Settings InfoLevel set at $($InfoLevel.AppVolumes.Settings)."
-        Write-PscriboMessage "Collecting Active Directory Domain information."
+        Write-PScriboMessage "Collecting Active Directory Domain information."
     }
 
     process {
@@ -40,66 +40,66 @@ function Get-AbrAppVolSetting {
 
 
                 if ($Settings) {
-                    section -Style Heading3 "Settings" {
+                    Section -Style Heading3 "Settings" {
                         Paragraph "The following section details app volumes settings for $($AppVolServer.split('.')[0])."
                         BlankLine
 
                         $OutObj = @()
                         try {
-                            foreach($Setting in $Settings.data.setting){
-                                if($Setting.key -eq "ui_session_timeout"){
+                            foreach ($Setting in $Settings.data.setting) {
+                                if ($Setting.key -eq "ui_session_timeout") {
                                     $UISessionTimeout = $Setting.value
                                 }
                                 #Regular Backups
-                                if($Setting.key -eq "enable_data_disk_recurrent_backup"){
+                                if ($Setting.key -eq "enable_data_disk_recurrent_backup") {
                                     $RegularBackups = $Setting.value
                                 }
                                 #Regular Backups Days
-                                if($Setting.key -eq "data_disk_backup_recurrent_interval"){
+                                if ($Setting.key -eq "data_disk_backup_recurrent_interval") {
                                     $RegularBackupsInterval = $Setting.value
                                 }
                                 # Backup Storage Location
-                                if($Setting.key -eq "data_disk_backup_recurrent_datastore"){
+                                if ($Setting.key -eq "data_disk_backup_recurrent_datastore") {
                                     $StorageLocation = $Setting.value
                                 }
                                 # Backup Storage Path
-                                if($Setting.key -eq "data_disk_backup_recurrent_path"){
+                                if ($Setting.key -eq "data_disk_backup_recurrent_path") {
                                     $StoragePath = $Setting.value
                                 }
                                 # Backup Storage Path
-                                if($Setting.key -eq "manage_sec"){
+                                if ($Setting.key -eq "manage_sec") {
                                     $NonDomainEntities = $Setting.value
                                 }
                             }
 
-                            foreach ($Datastore in $Datastores.datastores){
-                                if($Datastore.uniq_string -eq $StorageLocation){
+                            foreach ($Datastore in $Datastores.datastores) {
+                                if ($Datastore.uniq_string -eq $StorageLocation) {
                                     $DatastoreBackupName = $Datastore.name
                                 }
                             }
 
-                            foreach($Setting in $Settings.data.advanced_setting){
+                            foreach ($Setting in $Settings.data.advanced_setting) {
                                 # Disable Volume Cache
-                                if($Setting.key -eq "DISABLE_SNAPVOL_CACHE"){
+                                if ($Setting.key -eq "DISABLE_SNAPVOL_CACHE") {
                                     $DisableSnapVolumeCache = $Setting.value
                                 }
                                 # Disable Token AD Query
-                                if($Setting.key -eq "DISABLE_TOKEN_AD_QUERY"){
+                                if ($Setting.key -eq "DISABLE_TOKEN_AD_QUERY") {
                                     $DisableTokenADQuery = $Setting.value
                                 }
-                                if($Setting.key -eq "JOIN_CEIP"){
+                                if ($Setting.key -eq "JOIN_CEIP") {
                                     $DisableJOINCEIP = $Setting.value
                                 }
-                                if($Setting.key -eq "ENABLE_ALLOW_PACKAGE_DELIVERY_TO_ANY_OS"){
+                                if ($Setting.key -eq "ENABLE_ALLOW_PACKAGE_DELIVERY_TO_ANY_OS") {
                                     $DisableDELIVERYTOANYOS = $Setting.value
                                 }
-                                if($Setting.key -eq "ENABLE_2X_VOLUMES"){
+                                if ($Setting.key -eq "ENABLE_2X_VOLUMES") {
                                     $Disable2XVolumes = $Setting.value
                                 }
-                                if($Setting.key -eq "disable_agent_session_cookie"){
+                                if ($Setting.key -eq "disable_agent_session_cookie") {
                                     $DisableAgentSessionCookie = $Setting.value
                                 }
-                                if($Setting.key -eq "ENABLE_PARTIAL_RECONFIG"){
+                                if ($Setting.key -eq "ENABLE_PARTIAL_RECONFIG") {
                                     $VMDKPackageResiliency = $Setting.value
                                 }
                             }
@@ -130,15 +130,13 @@ function Get-AbrAppVolSetting {
                                 $TableParams['Caption'] = "- $($TableParams.Name)"
                             }
                             $OutObj | Table @TableParams
-                        }
-                        catch {
-                            Write-PscriboMessage -IsWarning $_.Exception.Message
+                        } catch {
+                            Write-PScriboMessage -IsWarning $_.Exception.Message
                         }
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

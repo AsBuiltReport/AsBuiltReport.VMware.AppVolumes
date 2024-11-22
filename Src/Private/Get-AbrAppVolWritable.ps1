@@ -5,7 +5,7 @@ function Get-AbrAppVolWritable {
     .DESCRIPTION
         Documents the configuration of VMware APPVolume in Word/HTML/Text formats using PScribo.
     .NOTES
-        Version:        1.1.0
+        Version:        1.2.0
         Author:         Chris Hildebrandt, @childebrandt42
         Editor:         Jonathan Colon, @jcolonfzenpr
         Twitter:        @asbuiltreport
@@ -23,7 +23,7 @@ function Get-AbrAppVolWritable {
 
     begin {
         Write-PScriboMessage "Writables InfoLevel set at $($InfoLevel.AppVolumes.Writables)."
-        Write-PscriboMessage "Collecting Writables information."
+        Write-PScriboMessage "Collecting Writables information."
     }
 
     process {
@@ -31,12 +31,12 @@ function Get-AbrAppVolWritable {
             try {
                 if ($PSVersionTable.PSEdition -eq 'Core') {
                     $Writables = Invoke-RestMethod -SkipCertificateCheck -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/writables"
-                } else {$Writables = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/writables"}
+                } else { $Writables = Invoke-RestMethod -WebSession $SourceServerSession -Method Get -Uri "https://$AppVolServer/app_volumes/writables" }
 
                 if ($Writables) {
-                    section -Style Heading3 "Writable Volumes" {
+                    Section -Style Heading3 "Writable Volumes" {
                         Paragraph "The following section provide a summary of writable volumes on $($AppVolServer.split('.')[0])."
-                        Blankline
+                        BlankLine
                         $OutObj = @()
                         foreach ($Writable in $Writables.data) {
                             try {
@@ -48,9 +48,8 @@ function Get-AbrAppVolWritable {
                                     'State' = $Writable.attached
                                 }
                                 $OutObj += [pscustomobject](ConvertTo-HashToYN $inObj)
-                            }
-                            catch {
-                                Write-PscriboMessage -IsWarning $_.Exception.Message
+                            } catch {
+                                Write-PScriboMessage -IsWarning $_.Exception.Message
                             }
                         }
 
@@ -64,10 +63,10 @@ function Get-AbrAppVolWritable {
                         }
                         $OutObj | Sort-Object -Property Name | Table @TableParams
                         if ($InfoLevel.AppVolumes.Writables -ge 2) {
-                            section -Style Heading4 "Writable Volume Details" {
+                            Section -Style Heading4 "Writable Volume Details" {
                                 foreach ($Writable in $Writables.data | Sort-Object -Property Name) {
                                     try {
-                                        section -ExcludeFromTOC -Style NOTOCHeading5 "Writable Volume Details for - $($Writable.Name)" {
+                                        Section -ExcludeFromTOC -Style NOTOCHeading5 "Writable Volume Details for - $($Writable.Name)" {
                                             $inObj = [ordered] @{
                                                 'Owner' = $Writable.name
                                                 'Owner Type' = $Writable.Owner_Type
@@ -105,18 +104,16 @@ function Get-AbrAppVolWritable {
                                             }
                                             $OutObj | Table @TableParams
                                         }
-                                    }
-                                    catch {
-                                        Write-PscriboMessage -IsWarning $_.Exception.Message
+                                    } catch {
+                                        Write-PScriboMessage -IsWarning $_.Exception.Message
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-            catch {
-                Write-PscriboMessage -IsWarning $_.Exception.Message
+            } catch {
+                Write-PScriboMessage -IsWarning $_.Exception.Message
             }
         }
     }

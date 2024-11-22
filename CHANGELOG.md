@@ -1,5 +1,19 @@
 # :arrows_clockwise: VMware AppVolumes As Built Report Changelog
 
+## [1.2.0] - Unreleased
+
+### Added
+
+- Tested Report with App Volumes v2410
+- Added code to properly display space information
+
+### Changed
+
+- Changed Required Modules to AsBuiltReport.Core v1.4.0
+- Improved detection of empty fields in tables
+- Improved detection of true/false elements in tables
+- Updated GitHub release workflow to add post to Bluesky social platform
+
 ## [1.1.0] - 2023-1-1
 
 ### Added
@@ -14,7 +28,7 @@
 
 ### Fixed
 
-- Fixed issue with ssl certificate verification in PwSh <= 5 
+- Fixed issue with ssl certificate verification in PwSh <= 5
 
 ## [0.2.0] - 2022-10-12
 
